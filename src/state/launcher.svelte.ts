@@ -2,6 +2,7 @@ import { applications } from "../constants";
 
 let isOpen = $state(false);
 let searchQuery = $state("");
+let pinned = $state(false);
 
 let filteredApplications = $derived(
     searchQuery.trim() === "" 
@@ -22,8 +23,10 @@ export const launcher = {
         isOpen = !isOpen; 
         if (!isOpen) searchQuery = "";
     },
-    close() { 
-        isOpen = false; 
-        searchQuery = ""; 
+    
+    close() {
+        if (pinned) return;
+        isOpen = false;
+        searchQuery = "";
     }
 }

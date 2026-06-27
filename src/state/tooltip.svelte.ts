@@ -1,43 +1,64 @@
+import { computePosition, flip, shift, offset } from "@floating-ui/dom";
+
 let showTooltip = $state(false);
 let tooltipText = $state("");
 let tooltipAltText = $state("");
-let mouseX = $state(0);
-let mouseY = $state(0);
-let tooltipWidth = 0;
-let tooltipHeight = 0;
+let tooltipX = $state(0);
+let tooltipY = $state(0);
 let timer: ReturnType<typeof setTimeout>;
+
+let ref: HTMLElement | null = null;
 
 export const tooltip = {
     get show() { return showTooltip; },
     get text() { return tooltipText; },
     get altText() { return tooltipAltText; },
-    get x() { return mouseX; },
-    get y() { return mouseY; },
-    get width() { return tooltipWidth; },
-    get height() { return tooltipHeight; },
+    get x() { return tooltipX; },
+    get y() { return tooltipY; },
 
-    measure(node: HTMLElement) {
-        tooltipWidth = node.offsetWidth;
-        tooltipHeight = node.offsetHeight;
+    registerElement(node: HTMLElement) {
+        ref = node;
+        return {
+            destroy() {
+                ref = null;
+            }
+        };
     },
-    updateCoords(event: MouseEvent) {
-        if (!showTooltip) {
-            mouseX = event.clientX;
-            mouseY = event.clientY;
-        }
-    },
-    hover(text: string, alt: string) {
-        timer = setTimeout(() => {
+
+    hover(event: MouseEvent, text: string, alt: string) {
+        clearTimeout(timer);
+        const target = event.currentTarget as HTMLElement;
+        if (!target) return;
+
+        timer = setTimeout(async () => {
             tooltipText = text;
             tooltipAltText = alt || "";
             showTooltip = true;
-        }, 700);
+
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            if (!ref) return;
+
+            const { x, y } = await computePosition(target, ref, {
+                placement: 'top', 
+                middleware: [
+                    offset(8),
+                    flip(),
+                    shift({ padding: 8 })
+                ]
+            });
+
+            tooltipX = x;
+            tooltipY = y;
+        }, 500);
     },
+
     leave() {
         clearTimeout(timer);
         showTooltip = false;
     },
+
     destroy() {
         clearTimeout(timer);
     }
-}
+};

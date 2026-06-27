@@ -8,14 +8,13 @@
     });
 </script>
 
-<svelte:window on:mousemove={(e) => tooltip.updateCoords(e)} />
-
 {#if tooltip.show}
 <div id="tooltip"
-    use:tooltip.measure
-    transition:fade={{ duration: 150 }}
-    style:top={Math.min(tooltip.y + 20, window.innerHeight - tooltip.height - 10)}px
-    style:left={Math.min(tooltip.x, window.innerWidth - tooltip.width - 10)}px>
+     role="tooltip"
+     use:tooltip.registerElement
+     transition:fade={{ duration: 150 }}
+     style:left={tooltip.x}px
+     style:top={tooltip.y}px>
     <p id="tooltip-text">{tooltip.text}</p>
     <p id="tooltip-alt">{tooltip.altText}</p>
 </div>
@@ -23,9 +22,8 @@
 
 <style>
     #tooltip {
-        position: absolute;
-        top: 55px;
-        left: 10px;
+        width: max-content;
+        position: fixed;
         background: var(--mantle);
         color: var(--text);
         padding: 8px 12px;

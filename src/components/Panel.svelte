@@ -14,7 +14,7 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div id="launcher-icon"
          tabindex="0"
-         onmouseenter={() => tooltip.hover("Application Launcher", "Launcher to start applications")}
+         onmouseenter={(e) => tooltip.hover(e, "Application Launcher", "Launcher to start applications")}
          onmouseleave={tooltip.leave}
          onclick={(e) => {
             e.stopPropagation();
@@ -26,7 +26,7 @@
             <div class="task"
                  role="button"
                  tabindex="0"
-                 onmouseenter={() => tooltip.hover(app.name, app.description)}
+                 onmouseenter={(e) => tooltip.hover(e, app.name, app.description)}
                  onmouseleave={tooltip.leave}
                  onmousedown={() => wm.openApplication(app)}>
                 <div class="task-icon" style:background="url({app.icon})"></div>

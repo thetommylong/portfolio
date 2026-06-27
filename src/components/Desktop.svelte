@@ -5,6 +5,7 @@
 
     import type { Window } from '../types/window.js';
     import { panelState } from '../state/panel.svelte.js';
+    import { launcher } from '../state/launcher.svelte.js';
 
     let viewportWidth = $state(0);
     let viewportHeight = $state(0);
@@ -22,7 +23,13 @@
     });
 </script>
 
-<div id="desktop" bind:clientWidth={viewportWidth} bind:clientHeight={viewportHeight} style:--panel-height="{panelState.height}px">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<div id="desktop"
+     bind:clientWidth={viewportWidth}
+     bind:clientHeight={viewportHeight}
+     style:--panel-height="{panelState.height}px"
+     onclick={() => launcher.close()}>
     {#each wm.windows as win (win.instanceId)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div class="window"
@@ -54,7 +61,8 @@
         left: 0;
         width: 100vw;
         height: calc(100vh - var(--panel-height));
-        pointer-events: none;
+        pointer-events: auto;
+        z-index: 1;
     }
 
     #desktop .window {
