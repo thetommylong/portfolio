@@ -7,6 +7,8 @@ export interface Window {
     component: any;
     x: number;
     y: number;
+    width: number;
+    height: number;
     zIndex: number;
 }
 

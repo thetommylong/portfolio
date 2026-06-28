@@ -9,21 +9,25 @@ export const wm = {
     
     openApplication(app: Application) {
         currentIndex += 1;
-        const newWindow: Window = {
+        windows.push({
             instanceId: `${app.id}-${Date.now()}`,
             appId: app.id,
             name: app.name,
             component: app.app,
             x: 100 + (windows.length * 25),
             y: 100 + (windows.length * 25),
+            width: 400,
+            height: 300,
             zIndex: currentIndex
-        };
-        windows = [...windows, newWindow];
+        });
     },
     
     focusWindow(instanceId: string) {
-        currentIndex += 1;
-        windows = windows.map(w => w.instanceId === instanceId ? { ...w, zIndex: currentIndex } : w);
+        const win = windows.find(w => w.instanceId === instanceId);
+        if (win) {
+            currentIndex += 1;
+            win.zIndex = currentIndex; 
+        }
     },
     
     closeWindow(instanceId: string) {

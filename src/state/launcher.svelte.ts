@@ -3,6 +3,7 @@ import { applications } from "../constants";
 let isOpen = $state(false);
 let searchQuery = $state("");
 let pinned = $state(false);
+let selectedIndex = $state(0);
 
 let filteredApplications = $derived(
     searchQuery.trim() === "" 
@@ -16,9 +17,19 @@ let filteredApplications = $derived(
 export const launcher = {
     get isOpen() { return isOpen; },
     get searchQuery() { return searchQuery; },
-    set searchQuery(val) { searchQuery = val; },
+    set searchQuery(val) {
+        searchQuery = val;
+        selectedIndex = 0;
+    },
+    get selectedIndex() {
+        return selectedIndex;
+    },
+    set selectedIndex(val) {
+        selectedIndex = val;
+    },
     get applications() { return filteredApplications; },
-    
+    get pinned() { return pinned; },
+
     toggle() { 
         isOpen = !isOpen; 
         if (!isOpen) searchQuery = "";
@@ -28,5 +39,9 @@ export const launcher = {
         if (pinned) return;
         isOpen = false;
         searchQuery = "";
-    }
+    },
+    
+    togglePinned() {
+        pinned = !pinned;
+    },
 }

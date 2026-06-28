@@ -8,7 +8,14 @@
     let { now } = $props();
 </script>
 
-<div id="panel" style:--panel-height="{panelState.height}px">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<div id="panel"
+     style:--panel-height="{panelState.height}px"
+     onclick={(e) => {
+        e.stopPropagation();
+        launcher.close();
+     }}>
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -23,12 +30,13 @@
 
     <div id="task-manager">
         {#each applications as app}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
             <div class="task"
                  role="button"
                  tabindex="0"
                  onmouseenter={(e) => tooltip.hover(e, app.name, app.description)}
                  onmouseleave={tooltip.leave}
-                 onmousedown={() => wm.openApplication(app)}>
+                 onclick={() => wm.openApplication(app)}>
                 <div class="task-icon" style:background="url({app.icon})"></div>
             </div>
         {/each}

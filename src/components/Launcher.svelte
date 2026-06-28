@@ -1,32 +1,94 @@
 <script lang="ts">
-    import { slide } from 'svelte/transition';
+    import { slide, fade } from 'svelte/transition';
     import { launcher } from '../state/launcher.svelte.js';
     import { wm } from '../state/wm.svelte.js';
+    import { sessionMenu } from '../state/sessionMenu.svelte.js';
+    import { lockScreen } from '../state/lockScreen.svelte.js';
+    import { user } from '../constants.js';
+    
+    function focusSelf(node: HTMLInputElement) {
+        node.focus();
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+        const listLength = launcher.applications.length;
+        if (listLength === 0) return;
+
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            launcher.selectedIndex = (launcher.selectedIndex + 1) % listLength;
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            launcher.selectedIndex = (launcher.selectedIndex - 1 + listLength) % listLength;
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            const activeApp = launcher.applications[launcher.selectedIndex];
+            if (activeApp) {
+                wm.openApplication(activeApp);
+                launcher.close();
+            }
+        } else if (event.key === 'Escape') {
+            launcher.close();
+        }
+    }
+
+    let displayedName = $state(user.displayName);
 </script>
+
+
 
 {#if launcher.isOpen}
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div id="launcher" transition:slide={{ duration: 150 }} onclick={(e) => e.stopPropagation()}>
+<div id="launcher"
+     transition:slide={{ duration: 150 }}
+     onclick={(e) => e.stopPropagation()}
+     onkeydown={handleKeyDown}>
     <div id="header">
+        <div id="user">
+            <div id="profile"><div id="sName">TT</div></div>
+            <div id="name"
+                 onmouseenter={() => { displayedName = `${user.username}@portfolio` }}
+                 onmouseleave={() => { displayedName = user.displayName; }}>
+                 {displayedName}</div>
+        </div>
         <div id="search-box">
-            <div style:background={"/system-search-symbolic.svg"}></div>
-            <!-- svelte-ignore a11y_autofocus -->
+            <div class="icon" style:mask=url(/icons/system-search-symbolic.svg)></div>
             <input 
+                use:focusSelf
                 type="text" 
                 placeholder="Search..." 
                 bind:value={launcher.searchQuery}
-                autofocus
             />
+        </div>
+        <div id="actions">
+            <div class="icon"
+                 style:mask=url(/icons/settings-configure-symbolic.svg)
+                 style:width=32px
+                 style:height=32px
+                 style:scale=0.75
+            ></div>
+            <div class="icon"
+                 style:mask={launcher.pinned ? "url(/icons/window-unpin-symbolic.svg)" : "url(/icons/window-pin-symbolic.svg)"}
+                 style:width=32px
+                 style:height=32px
+                 style:scale=0.75
+                 onclick={launcher.togglePinned}
+            ></div>
         </div>
     </div>
     
     <div id="apps-list">
-        {#each launcher.applications as app}
-            <div class="app-item" role="button" tabindex="0" onclick={() => {
-                wm.openApplication(app);
-                launcher.close();
-            }}>
+        {#each launcher.applications as app, i}
+            <div class="app-item"
+                 class:active={i === launcher.selectedIndex}
+                 role="button"
+                 tabindex="0"
+                 onmouseenter={() => launcher.selectedIndex = i}
+                 onclick={() => {
+                     wm.openApplication(app);
+                     launcher.close();
+                 }}>
                 <img src={app.icon} alt={app.name} class="app-item-icon" />
                 <div class="app-item-meta">
                     <span class="app-item-name">{app.name}</span>
@@ -37,12 +99,61 @@
     </div>
     
     <div id="footer">
-        a
+        <div id="power-actions">
+            <div class="power-action"
+                 onclick={ () => {window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 't=' + Date.now();} }>
+                <div class="icon action-icon"
+                     style:mask=url(/icons/system-reboot-symbolic.svg)
+                ></div>Restart
+            </div>
+            <div class="power-action"
+                 onclick={ () => {
+                    const body = document.querySelector("body")!;
+                    body.innerHTML = "";
+                    body.style.backgroundColor = "#000";
+                    body.style.cursor = "none";
+                    } }>
+                <div class="icon action-icon"
+                     style:mask=url(/icons/system-shutdown-symbolic.svg)
+                ></div>Shut Down
+            </div>
+            <div class="power-action" onclick={(e) => sessionMenu.toggle(e)}>
+                <div class="icon action-icon"
+                     style:mask=url(/icons/system-log-out-symbolic.svg)
+                ></div>Session
+            </div>
+        </div>
     </div>
 </div>
 {/if}
 
+{#if sessionMenu.isOpen}
+<div id="session-dropdown" 
+         use:sessionMenu.register
+         transition:fade={{ duration: 100 }}
+         style:top="{sessionMenu.y}px"
+         style:left="{sessionMenu.x}px">
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><div class="icon action-icon" style:mask=url(/icons/lock-symbolic.svg)></div>Lock</div>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><div class="icon action-icon" style:mask=url(/icons/system-switch-user-symbolic.svg)></div>Switch User</div>
+    </div>
+{/if}
+
 <style>
+    .icon {
+        background-color: var(--text);
+        mask-repeat: no-repeat !important;
+        mask-position: center !important;
+        mask-size: contain !important;
+    }
+
+    #launcher, #launcher * {
+        box-sizing: border-box;
+    }
+
     #launcher {
         position: absolute;
         top: 46px;
@@ -59,34 +170,79 @@
         border-bottom-right-radius: 6px;
     }
 
+    #launcher #header,
     #launcher #footer {
-        height: 30px;
-    }
-
-    #launcher #header {
-        height: 30px;
+        padding: 8px 16px;
         display: flex;
     }
 
-    #launcher #header #search-box {
-        height: 30px;
-        padding: 6px 24px;
+    #launcher #header {
         border-bottom: 1px solid var(--surface0);
     }
 
-    #launcher #header #search-box input {
-        height: 16px;
-        width: calc(100% - 16px);
-        padding: 6px 8px;
+    #launcher #header #user {
+        flex: 1;
+        display: flex;
+        height: 100%;
+        align-items: center;
+    }
+
+    #launcher #header #user #profile {
+        width: 32px;
+        height: 32px;
+        background-color: var(--surface0);
+        border: 1px solid var(--accent);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #launcher #header #user #profile #sName {
+        text-align: center;
+        color: var(--accent);
+    }
+
+    #launcher #header #user #name {
+        margin-left: 6px;
+        overflow: hidden;
+    }
+
+    #launcher #header #search-box {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+
         background: var(--base);
         border: 1px solid var(--surface1);
         border-radius: 4px;
-        color: var(--text);
-        outline: none;
+        width: 50%;
     }
 
-    #launcher #header #search-box input:focus {
+    #launcher #header #search-box div {
+        height: 16px;
+        width: 16px;
+    }
+
+    #launcher #header #search-box input {
+        flex: 1;
+        height: 16px;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
+        padding: 0;
+        font-size: 0.9rem;
+    }
+
+    #launcher #header #search-box:focus-within {
         border-color: var(--accent);
+    }
+
+    #launcher #header #actions {
+        display: flex;
+        margin-left: 4px;
     }
 
     #launcher #apps-list {
@@ -107,8 +263,14 @@
         cursor: pointer;
     }
 
-    .app-item:hover {
+    .app-item:hover,
+    .app-item.active {
+        outline: none;
+    }
+
+    .app-item.active {
         background: var(--surface0);
+        border: 1px solid var(--accent);
     }
 
     .app-item .app-item-icon {
@@ -129,5 +291,65 @@
     .app-item .app-item-meta .app-item-desc {
         font-size: 0.75rem;
         color: var(--subtext0);
+    }
+    
+    #launcher #footer {
+        border-top: 1px solid var(--surface0);
+    }
+
+    #power-actions {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .power-action {
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 2px 6px 2px 2px;
+        font-size: 14px;
+    }
+
+    .power-action:hover {
+        border-color: var(--accent);
+    }
+
+    .action-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 4px;
+    }
+    
+    #session-dropdown {
+        position: fixed;
+        background: var(--mantle);
+        border: 1px solid var(--surface0);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        min-width: 130px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        z-index: 10001;
+    }
+
+    .session-options {
+        background: transparent;
+        border: none;
+        color: var(--text);
+        padding: 6px 12px;
+        text-align: left;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        display: flex;
+    }
+
+    .session-options:hover {
+        background: var(--surface0);
     }
 </style>
