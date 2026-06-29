@@ -11,13 +11,10 @@
     let vpHeight = $state(0);
 
     let activeW: Window | null = null;
-    let interactionType: 'drag' | 'resize' | null = null;
-    let sX = 0;
-    let sY = 0;
-    let sWinX = 0;
-    let sWinY = 0;
-    let sWinW = 0;
-    let sWinH = 0; 
+    let interactionType: 'drag' | 'resize' | null = $state(null);
+    let lastX = 0;
+    let lastY = 0;
+    let resizeDirections = $state({ top: false, bottom: false, left: false, right: false });
     
     $effect(() => {
         if (vpWidth === 0 || vpHeight === 0) return;
@@ -30,6 +27,54 @@
             if (win.y > maxY) win.y = maxY;
         });
     });
+ 
+    function handleWindowMouseDown(e: MouseEvent, win: Window) {
+        wm.focusWindow(win.instanceId);
+
+        // check for alt + mouse1 (left click)
+        if (e.altKey && e.button === 0) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            activeW = win;
+            interactionType = 'drag';
+            
+            lastX = e.clientX;
+            lastY = e.clientY;
+
+            window.addEventListener('mousemove', handleGlobalMove);
+            window.addEventListener('mouseup', stopInteraction);
+        }
+        // again but for mouse2 (right click)
+        else if (e.altKey && e.button === 2) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            const relativeX = e.clientX - rect.left;
+            const relativeY = e.clientY - rect.top;
+
+            // determine anchor zone
+            const isLeft = relativeX < rect.width / 2;
+            const isTop = relativeY < rect.height / 2;
+
+            resizeDirections = {
+                top: isTop,
+                bottom: !isTop,
+                left: isLeft,
+                right: !isLeft
+            };
+
+            activeW = win;
+            interactionType = 'resize';
+            
+            lastX = e.clientX;
+            lastY = e.clientY;
+
+            window.addEventListener('mousemove', handleGlobalMove);
+            window.addEventListener('mouseup', stopInteraction);
+        }
+    }
 
     function startInteraction(e: MouseEvent, win: Window, type: 'drag' | 'resize') {
         e.preventDefault();
@@ -39,12 +84,9 @@
         
         activeW = win;
         interactionType = type;
-        sX = e.clientX;
-        sY = e.clientY;
-        sWinX = win.x;
-        sWinY = win.y;
-        sWinW = win.width || 400;
-        sWinH = win.height || 300;
+        
+        lastX = e.clientX;
+        lastY = e.clientY;
 
         window.addEventListener('mousemove', handleGlobalMove);
         window.addEventListener('mouseup', stopInteraction);
@@ -53,12 +95,15 @@
     function handleGlobalMove(e: MouseEvent) {
         if (!activeW || !interactionType) return;
 
-        const deltaX = e.clientX - sX;
-        const deltaY = e.clientY - sY;
+        const dX = e.clientX - lastX;
+        const dY = e.clientY - lastY;
+
+        const MIN_WIDTH = 200;
+        const MIN_HEIGHT = 150;        
 
         if (interactionType === 'drag') {
-            let newX = sWinX + deltaX;
-            let newY = sWinY + deltaY;
+            let newX = activeW.x + dX;
+            let newY = activeW.y + dY;
 
             const maxX = vpWidth - activeW.width;
             const maxY = vpHeight - activeW.height;
@@ -67,14 +112,41 @@
             activeW.y = Math.max(0, Math.min(newY, maxY));
         } 
         else if (interactionType === 'resize') {
-            let newW = sWinW + deltaX;
-            let newH = sWinH + deltaY;
+            if (resizeDirections.right) {
+                const newW = activeW.width + dX;
+                if (newW >= MIN_WIDTH && activeW.x + newW <= vpWidth) {
+                    activeW.width = Math.max(MIN_WIDTH, Math.min(newW, vpWidth - activeW.x));
+                }
+            } 
+            else if (resizeDirections.left) {
+                const newW = activeW.width - dX;
+                const newX = activeW.x + dX;
+                if (newW >= MIN_WIDTH && newX >= 0) {
+                    activeW.width = newW;
+                    activeW.x = newX;
+                }
+            }
 
-            activeW.width = Math.max(200, Math.min(newW, vpWidth - activeW.x));
-            activeW.height = Math.max(150, Math.min(newH, vpHeight - activeW.y));
+            if (resizeDirections.bottom) {
+                const newH = activeW.height + dY;
+                if (newH >= MIN_HEIGHT && activeW.y + newH <= vpHeight) {
+                    activeW.height = Math.max(MIN_HEIGHT, Math.min(newH, vpHeight - activeW.y));
+                }
+            } 
+            else if (resizeDirections.top) {
+                const newH = activeW.height - dY;
+                const newY = activeW.y + dY;
+                if (newH >= MIN_HEIGHT && newY >= 0) {
+                    activeW.height = newH;
+                    activeW.y = newY;
+                }
+            }
         }
-    }
 
+        lastX = e.clientX;
+        lastY = e.clientY;
+    }
+    
     function stopInteraction() {
         activeW = null;
         interactionType = null;
@@ -89,6 +161,9 @@
      bind:clientWidth={vpWidth}
      bind:clientHeight={vpHeight}
      style:--panel-height="{panelState.height}px"
+     class:dragging={interactionType === 'drag'}
+     class:resizing-nwse={interactionType === 'resize' && ((resizeDirections.top && resizeDirections.left) || (resizeDirections.bottom && resizeDirections.right))}
+     class:resizing-nesw={interactionType === 'resize' && ((resizeDirections.top && resizeDirections.right) || (resizeDirections.bottom && resizeDirections.left))}
      onclick={() => launcher.close()}>
     {#each wm.windows as win (win.instanceId)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -99,7 +174,8 @@
             style:height="{win.height}px"
             style:z-index={win.zIndex}
             transition:scale={{ duration: 200, start: 0.92, easing: cubicOut }}
-            onmousedown={() => wm.focusWindow(win.instanceId)}
+            oncontextmenu={(e) => { if (e.altKey) e.preventDefault(); }}
+            onmousedown={(e) => handleWindowMouseDown(e, win)}
             >
             <div style="background: rgba(0,0,0,0.8); color: #0f0; font-family: monospace; font-size: 10px; padding: 4px; position: absolute; top: 30px; left: 0; z-index: 9999;">Pos: {win.x}px, {win.y}px | Size: {win.width}px x {win.height}px</div>
             <div class="titlebar" onmousedown={(e) => startInteraction(e, win, "drag")}>
@@ -184,7 +260,24 @@
         background: transparent;
         z-index: 999;
     }
+    
+    #desktop.dragging,
+    #desktop.dragging * {
+        cursor: move !important;
+        user-select: none !important;
+    }
 
+    #desktop.resizing-nwse,
+    #desktop.resizing-nwse * {
+        cursor: nwse-resize !important;
+        user-select: none !important;
+    }
+
+    #desktop.resizing-nesw,
+    #desktop.resizing-nesw * {
+        cursor: nesw-resize !important;
+        user-select: none !important;
+    }
     .window .resize-handle.corner-br {
         bottom: 0;
         right: 0;
