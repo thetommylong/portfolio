@@ -10,6 +10,7 @@ export interface Window {
     width: number;
     height: number;
     zIndex: number;
+    isVisible: boolean;
 }
 
 export interface Application {
@@ -18,4 +19,5 @@ export interface Application {
     description: string;
     app: Component;
     icon: string;
+    overrides?: Partial<Omit<Window, 'instanceId' | 'appId' | 'zIndex' | 'component'>>;
 }

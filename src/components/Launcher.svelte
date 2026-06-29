@@ -119,7 +119,7 @@
             </div>
             <div class="power-action" onclick={(e) => sessionMenu.toggle(e)}>
                 <div class="icon action-icon"
-                     style:mask=url(/icons/system-log-out-symbolic.svg)
+                     style:mask=url(/icons/system-log-out-circle.svg)
                 ></div>Session
             </div>
         </div>

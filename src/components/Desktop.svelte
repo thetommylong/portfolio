@@ -6,6 +6,7 @@
     import type { Window } from '../types/window.js';
     import { panelState } from '../state/panel.svelte.js';
     import { launcher } from '../state/launcher.svelte.js';
+  import { stopPropagation } from 'svelte/legacy';
 
     let vpWidth = $state(0);
     let vpHeight = $state(0);
@@ -168,6 +169,7 @@
     {#each wm.windows as win (win.instanceId)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div class="window"
+            class:minimized={!win.isVisible}
             style:top="{win.y}px" 
             style:left="{win.x}px" 
             style:width="{win.width}px"
@@ -180,10 +182,18 @@
             <div style="background: rgba(0,0,0,0.8); color: #0f0; font-family: monospace; font-size: 10px; padding: 4px; position: absolute; top: 30px; left: 0; z-index: 9999;">Pos: {win.x}px, {win.y}px | Size: {win.width}px x {win.height}px</div>
             <div class="titlebar" onmousedown={(e) => startInteraction(e, win, "drag")}>
                 <span class="title">{win.name}</span>
-                <button class="close-btn" onclick={(e) => {
-                    e.stopPropagation();
-                    wm.closeWindow(win.instanceId);
-                }}>✕</button>
+                <div class="action-buttons">
+                    <!-- svelte-ignore a11y_consider_explicit_label -->
+                    <button class="minimize-btn" onclick={(e) => {
+                        e.stopPropagation();
+                        wm.toggleVisibility(win.instanceId);
+                    }}><div class="action-icon" style:mask=url(/icons/window-minimize-symbolic.svg)></div></button>
+                    <!-- svelte-ignore a11y_consider_explicit_label -->
+                    <button class="close-btn" onclick={(e) => {
+                        e.stopPropagation();
+                        wm.closeWindow(win.instanceId);
+                    }}><div class="action-icon" style:mask=url(/icons/tab-close-symbolic.svg)></div></button>
+                </div>
             </div>
             
             <div class="window-content">
@@ -217,7 +227,21 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        pointer-events: auto; 
+        pointer-events: auto;
+        transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1), 
+                    opacity 0.2s ease-out, 
+                    visibility 0.25s;
+        transform: scale(1);
+        opacity: 1;
+        visibility: visible;
+        transform-origin: top center; 
+    }
+
+    #desktop .window.minimized {
+        transform: scale(0.92);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
 
     .window .titlebar {
@@ -237,16 +261,44 @@
         font-size: .85rem;
     }
 
-    .window .titlebar .close-btn {
+    .window .titlebar .action-buttons {
+        margin-left: auto;
+    }
+    
+    .window .titlebar .action-buttons * {
         background: none;
         border: none;
         color: white;
-        margin-left: auto;
+        padding: 0;
+        margin: 1px;
     }
 
-    .window .titlebar .close-btn:hover {
+    .window .titlebar .action-buttons .action-icon {
+        background-color: var(--text);
+        border-radius: 50%;
+    }
+    
+    .window .titlebar .action-buttons .close-btn:hover {
         background-color: var(--accent);
         border-radius: 50%;
+    }
+
+    .window .titlebar .action-buttons .close-btn:hover .action-icon {
+        background-color: var(--base);
+    }
+    
+    .window .titlebar .action-buttons .minimize-btn:hover {
+        background-color: var(--surface0);
+        border-radius: 50%;
+    }
+    
+    .action-icon {
+        background-color: var(--text);
+        mask-repeat: no-repeat !important;
+        mask-position: center !important;
+        mask-size: contain !important;
+        width: 16px;
+        height: 16px;
     }
 
     .window .window-content {
