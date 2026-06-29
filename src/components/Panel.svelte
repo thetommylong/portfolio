@@ -1,11 +1,31 @@
 <script lang="ts">
     import { wm } from '../state/wm.svelte';
+    import type { Application } from '../types/window';
     import { launcher } from '../state/launcher.svelte';
     import { panelState } from '../state/panel.svelte';
     import { tooltip } from '../state/tooltip.svelte';
     import { applications } from '../constants';
 
     let { now } = $props();
+
+    function onTaskInteraction(app: Application) {
+        if (!wm.isRunning(app.id)) wm.openApplication(app);
+        else {
+            const instances = wm.windows.filter(w => w.appId === app.id);
+            const focused = instances.find(w => wm.isFocused(w.instanceId));
+
+            if (focused) {
+                const cur = instances.indexOf(focused);
+                const next = (cur + 1) % instances.length;
+                if (cur != next) wm.focusWindow(instances[next].instanceId);
+                else { wm.toggleVisibility(focused.instanceId) }
+            } else {
+                // Focus the first available instance
+                wm.focusWindow(instances[0].instanceId);
+            }
+
+        }
+    }
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -32,11 +52,13 @@
         {#each applications as app}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <div class="task"
+                 class:active={wm.isRunning(app.id)}
+                 class:focused={wm.isAppFocused(app.id)}
                  role="button"
                  tabindex="0"
                  onmouseenter={(e) => tooltip.hover(e, app.name, app.description)}
                  onmouseleave={tooltip.leave}
-                 onclick={() => wm.openApplication(app)}>
+                 onclick={() => onTaskInteraction(app)}>
                 <div class="task-icon" style:background="url({app.icon})"></div>
             </div>
         {/each}
@@ -122,5 +144,15 @@
         background-size: contain !important;
         background-repeat: no-repeat !important;
         background-position: center !important;
+    }
+
+    .task.active {
+        background-color: var(--surface0);
+        box-shadow: inset 0 -4px 0 0 var(--surface1);
+    }
+
+    .task.focused {
+        background-color: color-mix(in srgb, var(--accent), black 40%);
+        box-shadow: inset 0 -4px 0 0 var(--accent);
     }
 </style>
