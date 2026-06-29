@@ -1,4 +1,4 @@
-let locked = $state(true);
+let locked = $state(false);
 
 export const lockScreen = {
     get locked() { return locked; },
