@@ -1,9 +1,60 @@
- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce finibus nunc in lacus elementum ornare. Nam a condimentum eros. Aliquam posuere, nisi tincidunt maximus pellentesque, risus tellus auctor odio, ut tempor lacus metus quis diam. Ut vehicula nibh eu felis consequat, sit amet dictum lacus rhoncus. Etiam viverra enim bibendum pellentesque venenatis. Vestibulum augue leo, tempor nec blandit non, malesuada sit amet odio. Vestibulum nec lacinia orci. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum venenatis ante non leo scelerisque vehicula in vitae tellus. Praesent semper, justo sed porta bibendum, turpis ante porttitor ipsum, vitae vulputate metus erat sed metus. Suspendisse dolor est, eleifend in lacus vel, facilisis semper turpis. Sed consequat pretium sem eu pulvinar. Donec congue nisl sit amet lectus posuere sagittis. Aliquam erat volutpat. Mauris non ultricies ex.
+<script>
+    import { user, info } from "../constants";
+</script>
 
-Donec at lacus lacus. Donec eget eros eu velit maximus commodo. Nulla eu placerat neque, id bibendum purus. Praesent efficitur ex ut tempor blandit. Sed mauris arcu, egestas at ante nec, ultrices pulvinar mi. Quisque ac hendrerit diam. Pellentesque eget scelerisque lacus. Sed condimentum urna non urna tincidunt tincidunt. Fusce at risus eget nisl egestas molestie.
+<svelte:head>
+    <link rel="preload" href="https://github.com/{user.displayName}.png" as="image" />
+</svelte:head>
 
-Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed sodales maximus orci non condimentum. Quisque ut enim laoreet, sollicitudin metus non, pulvinar tellus. Curabitur in mattis ex, ac vehicula est. Aliquam id augue vitae eros molestie finibus id vitae ex. Sed sed tempus nisi, ac efficitur enim. Praesent gravida lacinia rhoncus. Praesent faucibus fermentum egestas. Nullam auctor nulla in interdum vestibulum. Aenean rhoncus ligula eu purus ultrices, at hendrerit nisi imperdiet. Integer pretium et ipsum sed tempor. Sed at diam eu orci semper porttitor non ut eros. Vestibulum porttitor, est eu mollis finibus, odio diam accumsan lectus, et ornare enim nulla blandit felis. Vivamus vitae enim id justo egestas pretium non quis leo.
+<div id="container">
+    <!-- todo: not hardcode this user -->
+    <img id="profile" src="https://github.com/{user.displayName}.png" alt="user avatar" />
+    <div id="info">
+            <div id="user-info"><div id=user>{user.username}</div>@<div id="host">portfolio</div></div>
+        {#each info as info}
+            <div class="info-line">
+                <span class="key">{info.label}</span>: <span class="value">{info.value}</span>
+            </div>
+        {/each} 
+    </div>
+</div>
 
-Donec at sollicitudin nibh, ut volutpat leo. Mauris viverra ante risus, nec pulvinar nulla efficitur at. Cras tincidunt ligula libero, vel ullamcorper libero tincidunt a. Ut dapibus odio in nunc ornare, in iaculis nulla consectetur. Maecenas vel enim velit. Pellentesque lobortis nisl a ligula ullamcorper, id tincidunt velit tincidunt. Proin ut purus urna. Maecenas molestie leo sit amet sem euismod, non maximus purus efficitur. Ut euismod tincidunt tortor a ornare. Sed dignissim nisi eu pulvinar convallis. Quisque posuere enim nec arcu iaculis, sit amet faucibus purus egestas. Phasellus sed orci magna. Aliquam metus odio, gravida ac iaculis nec, ornare ut ante. Morbi sollicitudin ornare elementum. Nam sollicitudin arcu purus, pretium congue eros tempus ac. Etiam varius pellentesque sollicitudin.
+<style>
+    #container {
+        display: flex;
+        flex-direction: row;
+        align-items: top;
+        width: 100%;
+        height: 100%;
+        gap: 16px;
+    }
 
-Etiam viverra sapien metus, a aliquam justo placerat a. Nulla ut eros dolor. Morbi iaculis venenatis nibh sed tincidunt. Sed ultrices aliquet gravida. Nullam fringilla urna eget purus luctus, eget fermentum magna laoreet. Cras dignissim venenatis porta. Donec non elit vitae dui vestibulum faucibus. 
+    #profile {
+        min-width: 0;
+        min-height: 0;
+        object-fit: contain;
+        object-position: top left;
+    }
+    
+    #info {
+        flex: 1;
+    }
+
+    #user-info {
+        display: flex;
+        flex-direction: row;
+        border-bottom: 1px solid var(--text);
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    #user-info * {
+        color: var(--red);
+        font-weight: 700;
+    }
+
+    .info-line .key {
+        color: var(--accent);
+        font-weight: 700;
+    }
+</style>

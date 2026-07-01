@@ -1,3 +1,4 @@
+import { applications } from "../constants";
 import type { Application, Window } from "../types/window";
 
 let windows = $state<Window[]>([]);
@@ -7,7 +8,7 @@ let focused: Window | null = $state(null);
 export const wm = {
     get windows() { return windows; },
     get currentIndex() { return currentIndex; },
-    
+
     openApplication(app: Application) {
         currentIndex += 1;
 
@@ -27,6 +28,11 @@ export const wm = {
 
         windows.push(window);
         focused = window;
+    },
+
+    openAppById(appId: string, overrides: Application["overrides"] = {}) {
+        const app = applications.find(a => a.id === appId);
+        if (app) this.openApplication({ ...app, ...overrides });
     },
     
     focusWindow(instanceId: string) {
