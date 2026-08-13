@@ -9,8 +9,8 @@
     import Panel from './components/Panel.svelte';
     import LockScreen from './components/LockScreen.svelte';
     
-    import { background, user } from './constants';
-  import { lockScreen } from './state/lockScreen.svelte';
+    import { background } from './constants';
+    import { lockScreen } from './state/lockScreen.svelte';
 
     let currentFlavorName: keyof typeof flavors = "mocha";
     let activeFlavor = flavors[currentFlavorName];
@@ -23,16 +23,6 @@
         if (target) target.setAttribute('style', themeVariables);
     });
  
-    // lock screen engine
-    let unlocked = $state(false);
-    const idlePeriod = 10 * 60 * 1000;
-    let idleTimer: ReturnType<typeof setTimeout>;
-
-    function resetIdleTimer() {
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(() => { unlocked = false; }, idlePeriod);
-    }
-
     // time
     let now = $state(new Date());
     const clockInterval = setInterval(() => now = new Date(), 1000);
@@ -40,23 +30,65 @@
     onMount(() => {
         // reset idle on events
         const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
-        events.forEach(event => window.addEventListener(event, resetIdleTimer));
+        events.forEach(event => window.addEventListener(event, lockScreen.resetLockTimeout));
 
         // start the timer
-        resetIdleTimer();
+        lockScreen.resetLockTimeout();
     });
 
     onDestroy(() => {
         // cleanup
         clearInterval(clockInterval);
-        clearTimeout(idleTimer);
     });
 </script>
 
+{#if window.innerWidth < 768}
+<div class="wrapper">
+    <div class="mobile-warning">
+        <h2>Init Failure</h2>
+        <p>This desktop environment requires a minimum display width of 768px (Mouse & Keyboard strongly recommended).</p>
+        <p>Please view on a desktop monitor to evaluate this portfolio.</p>
+        <button onclick={() => { window.open("https://github.com/thetommylong", "_blank") }}>Go to GitHub instead</button>
+    </div>
+</div>
+
+<style>
+    .wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        box-sizing: border-box;
+        padding: 48px;
+        background-color: var(--mantle);
+    }
+
+    .mobile-warning {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+        padding: 16px;
+        margin: 32px;
+        background-color: var(--base);
+        border-radius: 16px;
+    }
+
+    button {
+        background-color: var(--accent);
+        border: none;
+        outline: none;
+        border-radius: 24px;
+        padding: 1rem;
+    }
+</style>
+{:else}
 
 <img
     id="background"
-    src={lockScreen.locked ? background.blurred : background.normal}
+    class:blurred={lockScreen.locked}
+    src={background}
     alt="Wallpaper"
     transition:fade={{ duration: 150 }}/>
 
@@ -72,6 +104,7 @@
     <Tooltip />
 </div>
 {/if}
+{/if}
 
 <style>
     :global(:root) {
@@ -84,14 +117,22 @@
         padding: 0;
         overflow: hidden;
     }
-
+    
     :global(#app) {
         width: 100%;
         height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: -9999;
+
         --accent: var(--mauve);
         color: var(--text);
+        background-color: var(--mantle);
     }
-
+    
     #background {
         position: fixed;
         top: 0;
@@ -102,5 +143,9 @@
         z-index: -5;
         transform: scale(1.1);
     }
- 
+
+    .blurred {
+        filter: blur(20px);
+        transform: scale(1.05);
+    }
 </style>

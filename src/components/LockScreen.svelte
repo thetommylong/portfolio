@@ -1,9 +1,14 @@
 <script>
+    import { onDestroy } from "svelte";
     import { fade } from "svelte/transition";
     import { lockScreen } from "../state/lockScreen.svelte";
     import { user } from "../constants";
 
     let { now } = $props();
+
+    onDestroy(() => {
+        lockScreen.destroy();
+    })
 </script>
 
 <div id="lock-screen" transition:fade={{ duration: 150 }}>

@@ -40,7 +40,7 @@ export const tooltip = {
             if (!ref) return;
 
             const { x, y } = await computePosition(target, ref, {
-                placement: 'top', 
+                placement: 'bottom-start', 
                 middleware: [
                     offset(8),
                     flip(),

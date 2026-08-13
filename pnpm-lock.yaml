@@ -14,6 +14,9 @@ importers:
       '@floating-ui/dom':
         specifier: ^1.7.6
         version: 1.7.6
+      idb-keyval:
+        specifier: ^6.3.0
+        version: 6.3.0
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7.1.2
@@ -288,6 +291,9 @@ packages:
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+
+  idb-keyval@6.3.0:
+    resolution: {integrity: sha512-um+2dgAWmYsu615EXpWVwSmapJhON0G43t3Ka/EVaohzPQXSMqKEqeDK/oIW3Ow+BXaF2PvSc+oBTFp793A5Ow==}
 
   image-size@0.5.5:
     resolution: {integrity: sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==}
@@ -727,6 +733,8 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
     optional: true
+
+  idb-keyval@6.3.0: {}
 
   image-size@0.5.5:
     optional: true

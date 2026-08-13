@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { scale } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
     import { wm } from '../state/wm.svelte.js';
@@ -7,8 +6,6 @@
     import type { Window } from '../types/window.js';
     import { panelState } from '../state/panel.svelte.js';
     import { launcher } from '../state/launcher.svelte.js';
-
-    import { applications } from '../constants.js';
 
     let vpWidth = $state(0);
     let vpHeight = $state(0);
@@ -305,8 +302,7 @@
 
     .window .window-content {
         flex: 1;
-        padding: 16px;
-        overflow: auto;
+        overflow: hidden;
     } 
     
     .window .resize-handle {

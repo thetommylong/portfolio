@@ -4,6 +4,7 @@ import About from "./applications/About.svelte"
 import Dolphin from "./applications/Dolphin.svelte"
 import Konsole from "./applications/Konsole.svelte"
 import Settings from "./applications/Settings.svelte"
+import { settings } from "./state/settings.svelte"
 
 export const user = {
     displayName: "TheTommylong",
@@ -12,15 +13,11 @@ export const user = {
     get avatarUrl() { return `https://github.com/${this.displayName}.png` }
 }
 
-export const background = {
-    normal: "/background/mountain.png",
-    blurred: "/background/mountain-blurred.png",
-}
+export const background = settings.wallpaperUrl || "/background/mountain.png"
 
 // preload images
 new Image().src = user.avatarUrl;
-new Image().src = background.normal;
-new Image().src = background.blurred;
+new Image().src = background;
 
 export const applications: Application[] = [
     {
