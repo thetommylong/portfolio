@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { settings } from "../state/settings.svelte";
+  import { derived } from "svelte/store";
+    import { settings } from "../state/settings.svelte";
     import { colorScheme } from "../types/settings";
 
-    let theme = $state<colorScheme>(colorScheme.Automatic);
     let files = $state<FileList>();
-    let animationSpeed = $state<number>(1);
+    $effect(() => {
+        settings.setWallpaper(files?.[0] ?? null);
+    });
 
     const themeOptions = [
         { id: colorScheme.CatppuccinLatte, label: "Catppuccin Latte", img: "/misc/latte.jpg" },
@@ -18,11 +20,11 @@
         {#each themeOptions as item}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <div class="theme" onclick={() => theme = item.id}>
+            <div class="theme" onclick={() => settings.colorScheme = item.id}>
                 <img 
                     src={item.img} 
                     alt={item.label} 
-                    class:active={theme === item.id}
+                    class:active={settings.colorScheme === item.id}
                 >
                 <p>{item.label}</p>
             </div>
@@ -30,14 +32,14 @@
     </div>
 
     <div class="options animation-speed">
-        <label for="speed-slider">Animation speed: {animationSpeed}x</label>
+        <label for="speed-slider">Animation speed: {settings.animationSpeed}x</label>
         <input 
             id="speed-slider"
             type="range" 
             min="0.25" 
             max="2" 
             step="0.25" 
-            bind:value={animationSpeed}
+            bind:value={settings.animationSpeed}
         >
     </div>
 
@@ -76,8 +78,6 @@
         </label>
         <input bind:files accept="image/*" type="file" id="wallpaper-selector">
     </div>
-    
-    <button class="apply-button" onclick={() => settings.saveSettings()}>Apply</button>
 </div>
 
 <style>
@@ -118,11 +118,11 @@
     }
 
     .theme:hover img {
-        border: 8px solid #cba6f72e;
+        border: 8px solid color-mix(in srgb, var(--accent) 20%, transparent);
     }
 
     .theme img.active { 
-        border: 8px solid #cba6f7;
+        border: 8px solid var(--accent);
     }
 
     .theme p {
@@ -137,7 +137,7 @@
     }
 
     .selector-button {
-        background-color: #313244;
+        background-color: var(--surface0);
         padding: 6px 12px;
         border-radius: 0.5rem;
         cursor: pointer;
@@ -173,13 +173,13 @@
     }
 
     .animation-speed #speed-slider::-webkit-slider-runnable-track {
-        background-color: #313244;
+        background-color: var(--surface0);
         border-radius: 0.5rem;
         height: 8px;
     }
 
     .animation-speed #speed-slider::-moz-range-track {
-        background-color: #313244;
+        background-color: var(--surface0);
         border-radius: 0.5rem;
         height: 8px;
     }
@@ -190,7 +190,7 @@
         
         margin-top: -4px;
         
-        background-color: #cba6f7;
+        background-color: var(--accent);
         height: 16px;
         width: 16px;
         border-radius: 50%;
@@ -199,7 +199,7 @@
 
     .animation-speed #speed-slider::-moz-range-thumb {
         border: none;
-        background-color: #cba6f7;
+        background-color: var(--accent);
         height: 16px;
         width: 16px;
         border-radius: 50%;
@@ -209,7 +209,7 @@
     .animation-speed #speed-slider::-webkit-slider-thumb:hover,
     .animation-speed #speed-slider::-moz-range-thumb:hover {
         transform: scale(1.15);
-        background-color: #f5c2e7;
+        background-color: color-mix(in srgb, var(--accent) 20%, white);
     }
 
     .animation-speed #speed-slider:active::-webkit-slider-thumb,
@@ -234,7 +234,7 @@
     }
 
     .radio-option input[type="radio"] {
-        accent-color: #cba6f7;
+        accent-color: var(--accent);
         margin-top: 3px;
         cursor: pointer;
     }
@@ -251,22 +251,6 @@
 
     .option-desc {
         font-size: 12px;
-        color: #a6adc8;
-    }
-
-    button {
-        background-color: #cba6f7;
-        color: #1e1e2e;
-
-        border-radius: 2rem;
-        outline: none;
-        border: none;
-
-        padding: 6px 12px;
-        cursor: pointer;
-
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
+        color: var(--subtext0);
     }
 </style>

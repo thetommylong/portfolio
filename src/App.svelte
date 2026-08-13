@@ -3,6 +3,8 @@
     import { fade } from 'svelte/transition';
     import { flavors } from "@catppuccin/palette";
     
+    import { settings, resolveFlavorName } from './state/settings.svelte';
+
     import Tooltip from './components/Tooltip.svelte';
     import Desktop from './components/Desktop.svelte';
     import Launcher from './components/Launcher.svelte';
@@ -12,15 +14,15 @@
     import { background } from './constants';
     import { lockScreen } from './state/lockScreen.svelte';
 
-    let currentFlavorName: keyof typeof flavors = "mocha";
-    let activeFlavor = flavors[currentFlavorName];
-    let themeVariables = activeFlavor.colorEntries
-        .map(([name, meta]) => `--${name}: ${meta.hex};`)
-        .join(" ");
-    
+    let flavorName = $derived(resolveFlavorName(settings.colorScheme));
+
     $effect(() => {
-        const target = document.getElementById('app');
-        if (target) target.setAttribute('style', themeVariables);
+        const flavor = flavors[flavorName] || flavors.mocha;
+        const root = document.documentElement;
+
+        for (const [name, meta] of flavor.colorEntries as [string, { hex: string }][]) {
+            root.style.setProperty(`--${name}`, meta.hex);
+        }
     });
  
     // time

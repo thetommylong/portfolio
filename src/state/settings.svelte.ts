@@ -1,5 +1,7 @@
 import { get, set } from 'idb-keyval';
 import { colorScheme, type Settings } from "../types/settings";
+import { flavors } from '@catppuccin/palette';
+type FlavorKey = keyof typeof flavors;
 
 const saved = localStorage.getItem("settings");
 
@@ -19,6 +21,23 @@ const file = await get<File>('wallpaper');
 if (file) {
     wallpaperUrl = URL.createObjectURL(file);
 }
+
+export function resolveFlavorName(scheme: colorScheme): FlavorKey {
+    if (scheme === colorScheme.Automatic) {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        return prefersDark ? "mocha" : "latte";
+    }
+    return scheme as unknown as FlavorKey;
+}
+
+$effect.root(() => {
+    $effect(() => {
+        localStorage.setItem("settings", JSON.stringify(currentSettings));
+
+        const resolvedTheme = resolveFlavorName(currentSettings.colorScheme).toString();
+        document.documentElement.setAttribute("data-theme", resolvedTheme);
+    });
+});
 
 export const settings = {
     get animationSpeed() { return currentSettings.animationSpeed },
@@ -40,9 +59,5 @@ export const settings = {
             await set('wallpaper', null);
             wallpaperUrl = null;
         }
-    },
-
-    saveSettings() {
-        localStorage.setItem("settings", JSON.stringify(currentSettings));
     }
 };

@@ -6,7 +6,7 @@ export interface Settings {
 }
 
 export enum colorScheme {
-    CatppuccinLatte,
-    CatppuccinMocha,
-    Automatic
+    CatppuccinLatte = "latte",
+    CatppuccinMocha = "mocha",
+    Automatic       = "auto"
 }

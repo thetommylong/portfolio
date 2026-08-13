@@ -2,6 +2,7 @@
   import type { Repository } from "../types/repo.d.ts";
   import { tooltip } from "../state/tooltip.svelte";
   import repos from "../../test.json";
+  import { settings } from "../state/settings.svelte.js";
 
   var selectedItem: Repository = $state(repos[0]);
 </script>
@@ -11,17 +12,17 @@
       {#each repos as repo}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="item" class:selected={selectedItem.full_name === repo.full_name}
+        <div class="item" class:selected={ selectedItem.full_name === repo.full_name }
                           onclick={() => { if (selectedItem.full_name === repo.full_name) open(repo.html_url); selectedItem = repo; }}
-                          onmouseenter={(e) => tooltip.hover(e, repo.name, repo.description)}
+                          onmouseenter={(e) => { tooltip.hover(e, repo.name, repo.description); if (!settings.doubleClickToOpen) selectedItem = repo; }}
                           onmouseleave={tooltip.leave}>
-        <img src="/icons/folder.svg" alt="temp"/>
+        <img src="/icons/folder.svg" alt="{repo.name}"/>
         <p>{repo.name}</p>
         </div>
       {/each}
     </div>
   <div class="preview">
-    <img src="/icons/folder.svg" alt="temp" /> 
+    <img src="/icons/folder.svg" alt="{selectedItem.name}" /> 
     <p>{selectedItem.name}</p>
     <div class="metadata">
         <div class="metadata-a">Language:</div>
@@ -74,12 +75,12 @@
   }
 
   .item:hover {
-    background-color: #313244;
+    background-color: var(--surface0);
   }
 
   .item.selected {
-    background-color: #cba6f72e;
-    border-color: #cba6f7;
+    background-color: color-mix(in srgb, var(--accent) 20%, transparent);
+    border-color: var(--accent);
   }
 
   .item img {
@@ -99,7 +100,7 @@
     width: min(50%, 250px);
     height: 100%;
 
-    background-color: #181825;
+    background-color: var(--mantle);
 
     display: flex;
     flex-direction: column;
@@ -121,7 +122,7 @@
 
     width: 90%;
     padding-bottom: 8px;
-    border-bottom: 1px solid #313244;
+    border-bottom: 1px solid var(--surface0);
   }
 
   .metadata {
