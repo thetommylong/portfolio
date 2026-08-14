@@ -19,8 +19,8 @@ export const wm = {
             component: app.app,
             x: 100 + (windows.length * 25),
             y: 100 + (windows.length * 25),
-            width: 400,
-            height: 300,
+            width: 800,
+            height: 600,
             zIndex: currentIndex,
             isVisible: true,
             ...app.overrides

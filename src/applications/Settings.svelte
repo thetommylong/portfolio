@@ -5,8 +5,7 @@
 
     let files = $state<FileList>();
     $effect(() => {
-        settings.setWallpaper(files?.[0] ?? null);
-        window.location.reload();
+        if (files?.[0].name) settings.setWallpaper(files?.[0] ?? null);
     });
 
     const themeOptions = [

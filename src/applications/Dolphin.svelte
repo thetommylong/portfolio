@@ -1,10 +1,35 @@
 <script lang="ts">
+  import { onMount} from "svelte";
+
   import type { Repository } from "../types/repo.d.ts";
   import { tooltip } from "../state/tooltip.svelte";
-  import repos from "../../test.json";
   import { settings } from "../state/settings.svelte.js";
 
-  var selectedItem: Repository = $state(repos[0]);
+  let repos: Repository[] = [];
+  let selectedItem: Repository | null = null;
+
+  onMount(async () => {
+    try {
+      const cachedRepos = localStorage.getItem("repos");
+      const ttl = Number.parseInt(localStorage.getItem("repos_ttl") || "0", 10);
+      
+      if (cachedRepos && Date.now() < ttl) {
+        repos = JSON.parse(localStorage.getItem("repos")!);
+      } else {
+      const response = await fetch("https://api.github.com/users/thetommylong/repos");
+      if (!response.ok) throw new Error("Failed to fetch repositories");
+
+      repos = await response.json();
+
+      localStorage.setItem("repos", JSON.stringify(repos));
+      localStorage.setItem("repos_ttl", (Date.now() + 24 * 60 * 60 * 1000).toString());
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      selectedItem = repos[0];
+    }
+  });
 </script>
 
 <div class="nintendo-gamecube-codename">
@@ -12,8 +37,8 @@
       {#each repos as repo}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="item" class:selected={ selectedItem.full_name === repo.full_name }
-                          onclick={() => { if (selectedItem.full_name === repo.full_name) open(repo.html_url); selectedItem = repo; }}
+        <div class="item" class:selected={ selectedItem?.full_name === repo.full_name }
+                          onclick={() => { if (selectedItem?.full_name === repo.full_name) open(repo.html_url); selectedItem = repo; }}
                           onmouseenter={(e) => { tooltip.hover(e, repo.name, repo.description); if (!settings.doubleClickToOpen) selectedItem = repo; }}
                           onmouseleave={tooltip.leave}>
         <img src="/icons/folder.svg" alt="{repo.name}"/>
@@ -22,19 +47,19 @@
       {/each}
     </div>
   <div class="preview">
-    <img src="/icons/folder.svg" alt="{selectedItem.name}" /> 
-    <p>{selectedItem.name}</p>
+    <img src="/icons/folder.svg" alt="{selectedItem?.name}" /> 
+    <p>{selectedItem?.name}</p>
     <div class="metadata">
         <div class="metadata-a">Language:</div>
-        <div class="metadata-b">{selectedItem.language || "Unknown"}</div>
+        <div class="metadata-b">{selectedItem?.language || "Unknown"}</div>
     </div>
     <div class="metadata">
         <div class="metadata-a">Description:</div>
-        <div class="metadata-b">{selectedItem.description}</div>
+        <div class="metadata-b">{selectedItem?.description}</div>
     </div>
     <div class="metadata">
         <div class="metadata-a">License:</div>
-        <div class="metadata-b">{selectedItem.license?.spdx_id || "All Rights Reserved"}</div>
+        <div class="metadata-b">{selectedItem?.license?.spdx_id || "All Rights Reserved"}</div>
     </div>
   </div>
 </div>

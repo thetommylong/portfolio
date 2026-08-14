@@ -81,6 +81,9 @@ export const bash = {
                 wm.openAppById("info");
                 break;
             }
+            case "": {
+                break;
+            }
             default: {
                 output = `bash: ${val}: command not found`;
                 break;

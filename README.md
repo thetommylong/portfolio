@@ -39,6 +39,7 @@ Build: `pnpm build`
 - **Electron-adjacent performance** — runs fine, not super optimized
 - **Some animations stutter** on weaker hardware (acknowledged, probably not fixing)
 - **No window snapping** (too much work, honestly not worth it)
+- **Lock screen theming broken** (honestly i'm not fixing the colors no one will see it anyways)
 
 ## License
 

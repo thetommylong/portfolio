@@ -15,17 +15,17 @@ export const user = {
 
 export const background = settings.wallpaperUrl || "/background/mountain.png"
 
-// preload images
-new Image().src = user.avatarUrl;
-new Image().src = background;
-
 export const applications: Application[] = [
     {
         id: "info",
         name: "Info Center",
         description: "Provides information about me",
         app: About,
-        icon: "/icons/hwinfo.svg"
+        icon: "/icons/hwinfo.svg",
+        overrides: {
+            height: 450,
+            width: 900
+        }
     },
     {
         id: "dolphin",

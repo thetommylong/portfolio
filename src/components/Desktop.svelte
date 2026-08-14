@@ -178,7 +178,6 @@
             oncontextmenu={(e) => { if (e.altKey) e.preventDefault(); }}
             onmousedown={(e) => handleWindowMouseDown(e, win)}
             >
-            <div style="background: rgba(0,0,0,0.8); color: #0f0; font-family: monospace; font-size: 10px; padding: 4px; position: absolute; top: 30px; left: 0; z-index: 9999;">Pos: {win.x}px, {win.y}px | Size: {win.width}px x {win.height}px</div>
             <div class="titlebar" onmousedown={(e) => startInteraction(e, win, "drag")}>
                 <span class="title">{win.name}</span>
                 <div class="action-buttons">

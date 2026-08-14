@@ -7,7 +7,6 @@
 </svelte:head>
 
 <div id="container">
-    <!-- todo: not hardcode this user -->
     <img id="profile" src="https://github.com/{user.displayName}.png" alt="user avatar" />
     <div id="info">
             <div id="user-info"><div id=user>{user.username}</div>@<div id="host">portfolio</div></div>
@@ -23,12 +22,12 @@
     #container {
         display: flex;
         flex-direction: row;
-        align-items: top;
         width: 100%;
         height: 100%;
         gap: 16px;
 
         padding: 16px;
+        box-sizing: border-box;
     }
 
     #profile {

@@ -18,7 +18,7 @@
     </div>
     <div id="login">
         <div id="user">
-            <div id="icon" style:mask=url(/icons/avatar-default-symbolic.svg)></div>
+            <div id="icon" style:background=url({user.avatarUrl})></div>
         </div>
         <div id="name">{user.displayName}</div>
         <div id="username">{user.username}</div>
@@ -80,10 +80,9 @@
     #lock-screen #login #user #icon {
         height: 100%;
         width: 100%;
-        margin-top: 1.5rem;
-        background-color: var(--text);
-        mask-repeat: no-repeat !important;
-        mask-position: center !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: contain !important;
     }
 
     #lock-screen #login #name {
