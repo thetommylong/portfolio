@@ -9,9 +9,9 @@
     });
 
     const themeOptions = [
-        { id: colorScheme.CatppuccinLatte, label: "Catppuccin Latte", img: "/misc/latte.jpg" },
-        { id: colorScheme.CatppuccinMocha, label: "Catppuccin Mocha", img: "/misc/mocha.jpg" },
-        { id: colorScheme.Automatic, label: "Automatic", img: "/misc/auto.jpg" }
+        { id: colorScheme.CatppuccinLatte, label: "Catppuccin Latte", img: `${import.meta.env.BASE_URL}misc/latte.jpg` },
+        { id: colorScheme.CatppuccinMocha, label: "Catppuccin Mocha", img: `${import.meta.env.BASE_URL}misc/mocha.jpg` },
+        { id: colorScheme.Automatic, label: "Automatic", img: `${import.meta.env.BASE_URL}misc/auto.jpg` }
     ];
 </script>
 
