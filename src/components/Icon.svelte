@@ -1,5 +1,4 @@
 <!-- This file is heavily AI-assisted, I'm sorry. -->
-
 <script lang="ts">
   type IconProps = {
     name: string;
@@ -11,8 +10,15 @@
 
   let { name, mode = "mask", class: className = "", alt = "", onclick = () => {} }: IconProps = $props();
 
-  let cleanName = $derived(name.replace(/^\/?(icons\/)?/, "").replace(/\.svg$/, ""));
-  let fullPath = $derived(`${import.meta.env.BASE_URL}icons/${cleanName}.svg`);
+  let fullPath = $derived.by(() => {
+    if (name.startsWith("http://") || name.startsWith("https://") || name.startsWith("data:")) {
+      return name;
+    }
+
+    const clean = name.replace(/^\/?(icons\/)?/, "").replace(/\.svg$/, "");
+    return `${import.meta.env.BASE_URL}icons/${clean}.svg`;
+  });
+
   let urlFormat = $derived(`url("${fullPath}")`);
 </script>
 
