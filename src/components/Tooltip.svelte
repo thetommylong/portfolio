@@ -2,6 +2,7 @@
     import { onDestroy } from "svelte";
     import { fade } from "svelte/transition";
     import { tooltip } from "../state/tooltip.svelte";
+  import { settings } from "../state/settings.svelte";
 
     onDestroy(() => {
         tooltip.destroy();
@@ -12,7 +13,7 @@
 <div id="tooltip"
      role="tooltip"
      use:tooltip.registerElement
-     transition:fade={{ duration: 150 }}
+     transition:fade={{ duration: 150 * settings.animationSpeed }}
      style:left={tooltip.x}px
      style:top={tooltip.y}px>
     <p id="tooltip-text">{tooltip.text}</p>

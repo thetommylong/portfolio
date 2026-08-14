@@ -34,6 +34,8 @@ $effect.root(() => {
     $effect(() => {
         localStorage.setItem("settings", JSON.stringify(currentSettings));
 
+        document.body.style.setProperty('--speed', `${currentSettings.animationSpeed}`);
+
         const resolvedTheme = resolveFlavorName(currentSettings.colorScheme).toString();
         document.documentElement.setAttribute("data-theme", resolvedTheme);
     });

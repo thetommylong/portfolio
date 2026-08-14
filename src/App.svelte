@@ -92,14 +92,14 @@
     class:blurred={lockScreen.locked}
     src={background}
     alt="Wallpaper"
-    transition:fade={{ duration: 150 }}/>
+    transition:fade={{ duration: 150 * settings.animationSpeed }}/>
 
 {#if lockScreen.locked}
 <LockScreen {now} />
 {/if}
 
 {#if !lockScreen.locked}
-<div id="content" transition:fade={{ duration: 150 }}>
+<div id="content" transition:fade={{ duration: 150 * settings.animationSpeed }}>
     <Panel {now} />
     <Launcher />
     <Desktop />
@@ -118,6 +118,8 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
+
+        --speed: 1;
     }
     
     :global(#app) {

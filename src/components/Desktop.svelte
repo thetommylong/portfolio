@@ -7,6 +7,7 @@
     import { panelState } from '../state/panel.svelte.js';
     import { launcher } from '../state/launcher.svelte.js';
   import Icon from './Icon.svelte';
+  import { settings } from '../state/settings.svelte.js';
 
     let vpWidth = $state(0);
     let vpHeight = $state(0);
@@ -175,7 +176,7 @@
             style:width="{win.width}px"
             style:height="{win.height}px"
             style:z-index={win.zIndex}
-            transition:scale={{ duration: 200, start: 0.92, easing: cubicOut }}
+            transition:scale={{ duration: 200 * settings.animationSpeed, start: 0.92, easing: cubicOut }}
             oncontextmenu={(e) => { if (e.altKey) e.preventDefault(); }}
             onmousedown={(e) => handleWindowMouseDown(e, win)}
             >
@@ -227,9 +228,9 @@
         flex-direction: column;
         overflow: hidden;
         pointer-events: auto;
-        transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1), 
-                    opacity 0.2s ease-out, 
-                    visibility 0.25s;
+        transition: transform calc(0.25s * var(--speed)) cubic-bezier(0.1, 0.9, 0.2, 1), 
+                    opacity calc(0.2s * var(--speed)) ease-out, 
+                    visibility calc(0.25s * var(--speed));
         transform: scale(1);
         opacity: 1;
         visibility: visible;

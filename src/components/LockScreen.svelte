@@ -4,6 +4,7 @@
     import { lockScreen } from "../state/lockScreen.svelte";
     import { user } from "../constants";
   import Icon from "./Icon.svelte";
+  import { settings } from "../state/settings.svelte";
 
     let { now } = $props();
 
@@ -12,7 +13,7 @@
     })
 </script>
 
-<div id="lock-screen" transition:fade={{ duration: 150 }}>
+<div id="lock-screen" transition:fade={{ duration: 150 * settings.animationSpeed }}>
     <div id="datetime">
         <div id="time">{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit"})}</div>
         <div id="date">{now.toLocaleDateString([], { dateStyle: "full" })}</div>

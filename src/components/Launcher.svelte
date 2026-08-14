@@ -6,6 +6,7 @@
     import { lockScreen } from '../state/lockScreen.svelte.js';
     import { user } from '../constants.js';
     import Icon from './Icon.svelte';
+  import { settings } from '../state/settings.svelte.js';
     
     function focusSelf(node: HTMLInputElement) {
         node.focus();
@@ -42,7 +43,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div id="launcher"
-     transition:slide={{ duration: 150 }}
+     transition:slide={{ duration: 150 * settings.animationSpeed }}
      onclick={(e) => e.stopPropagation()}
      onkeydown={handleKeyDown}>
     <div id="header">
@@ -121,7 +122,7 @@
 {#if sessionMenu.isOpen}
 <div id="session-dropdown" 
          use:sessionMenu.register
-         transition:fade={{ duration: 100 }}
+         transition:fade={{ duration: 100 * settings.animationSpeed }}
          style:top="{sessionMenu.y}px"
          style:left="{sessionMenu.x}px">
         <!-- svelte-ignore a11y_click_events_have_key_events -->

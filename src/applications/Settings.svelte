@@ -6,6 +6,7 @@
     import latte from "/misc/latte.jpg?url"
     import mocha from "/misc/mocha.jpg?url"
     import auto from "/misc/auto.jpg?url"
+  import { set } from "idb-keyval";
 
     let files = $state<FileList>();
     $effect(() => {
@@ -36,11 +37,11 @@
     </div>
 
     <div class="options animation-speed">
-        <label for="speed-slider">Animation speed: {settings.animationSpeed}x</label>
+        <label for="speed-slider">Animation scale: {settings.animationSpeed == 0 ? "Instant" : `${settings.animationSpeed}x`}</label>
         <input 
             id="speed-slider"
             type="range" 
-            min="0.25" 
+            min="0" 
             max="2" 
             step="0.25" 
             bind:value={settings.animationSpeed}
@@ -198,7 +199,7 @@
         height: 16px;
         width: 16px;
         border-radius: 50%;
-        transition: transform 0.1s ease, background-color 0.1s ease;
+        transition: transform calc(0.1s * var(--speed)) ease, background-color calc(0.1s * var(--speed)) ease;
     }
 
     .animation-speed #speed-slider::-moz-range-thumb {
@@ -207,7 +208,7 @@
         height: 16px;
         width: 16px;
         border-radius: 50%;
-        transition: transform 0.1s ease, background-color 0.1s ease;
+        transition: transform calc(0.1s * var(--speed)) ease, background-color calc(0.1s * var(--speed)) ease;
     }
 
     .animation-speed #speed-slider::-webkit-slider-thumb:hover,
