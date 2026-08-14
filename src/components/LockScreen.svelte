@@ -3,6 +3,7 @@
     import { fade } from "svelte/transition";
     import { lockScreen } from "../state/lockScreen.svelte";
     import { user } from "../constants";
+  import Icon from "./Icon.svelte";
 
     let { now } = $props();
 
@@ -24,16 +25,18 @@
         <div id="username">{user.username}</div>
         <div id="input">
             <input type="password" onkeydown={(e) => {if (e.key === "Enter") lockScreen.locked = false;}} />
-            <div id="button">
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div id="button" onclick={() => { lockScreen.locked = false; }} >
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <div id="submit" style:mask=url(/icons/system-log-in-symbolic.svg) onclick={() => { lockScreen.locked = false; }}></div>
+                <Icon class="submit" name="system-log-in-symbolic" />
             </div>
         </div>
         <div id="actions">
             <!-- The following button does nothing. -->
             <!-- I am not making another lock screen to replicate SDDM-->
-            <div class="action"><div class="icon action-icon" style:mask=url(/icons/system-switch-user-symbolic.svg)></div>Switch User</div>
+            <div class="action"><Icon class="icon action-icon" name="system-switch-user-symbolic" />Switch User</div>
         </div>
     </div>
 </div>
@@ -115,7 +118,7 @@
         justify-content: center;
     }
 
-    #lock-screen #login #input #submit {
+    #lock-screen #login #input :global(#submit) {
         height: 100%;
         width: 100%;
         background-color: var(--text);
@@ -151,18 +154,18 @@
         color: var(--accent);
     }
 
-    .action:hover .icon {
+    .action:hover :global(.icon) {
         background-color: var(--accent);
     }
     
-    .icon {
+    #lock-screen :global(.icon) {
         background-color: var(--text);
         mask-repeat: no-repeat !important;
         mask-position: center !important;
         mask-size: contain !important;
     }
     
-    .action-icon {
+    #lock-screen :global(.action-icon) {
         width: 64px;
         height: 64px;
         border-radius: 50%;

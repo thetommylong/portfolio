@@ -6,6 +6,12 @@ import Konsole from "./applications/Konsole.svelte"
 import Settings from "./applications/Settings.svelte"
 import { settings } from "./state/settings.svelte"
 
+import hwinfo from "/icons/hwinfo.svg?url"
+import dolphin from "/icons/system-file-manager.svg?url"
+import terminal from "/icons/utilities-terminal.svg?url"
+import settingsIcon from "/icons/systemsettings.svg?url"
+import wallpaper from "/background/mountain.png?url"
+
 export const user = {
     displayName: "TheTommylong",
     username: "tommylong",
@@ -13,7 +19,7 @@ export const user = {
     get avatarUrl() { return `https://github.com/${this.displayName}.png` }
 }
 
-export const background = settings.wallpaperUrl || "/background/mountain.png"
+export const background = settings.wallpaperUrl || wallpaper
 
 export const applications: Application[] = [
     {
@@ -21,7 +27,7 @@ export const applications: Application[] = [
         name: "Info Center",
         description: "Provides information about me",
         app: About,
-        icon: "/icons/hwinfo.svg",
+        icon: hwinfo,
         overrides: {
             height: 450,
             width: 900
@@ -32,21 +38,21 @@ export const applications: Application[] = [
         name: "Dolphin",
         description: "Infomation about my projects",
         app: Dolphin,
-        icon: "/icons/system-file-manager.svg"
+        icon: dolphin
     },
     {
         id: "konsole",
         name: "Konsole",
         description: "Terminal emulator",
         app: Konsole,
-        icon: "/icons/utilities-terminal.svg"
+        icon: terminal
     },
     {
         id: "settings",
         name: "System Settings",
         description: "Configure your experience",
         app: Settings,
-        icon: "/icons/systemsettings.svg"
+        icon: settingsIcon
     }
 ]
 

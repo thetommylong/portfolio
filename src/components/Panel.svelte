@@ -5,6 +5,7 @@
     import { panelState } from '../state/panel.svelte';
     import { tooltip } from '../state/tooltip.svelte';
     import { applications } from '../constants';
+  import Icon from './Icon.svelte';
 
     let { now } = $props();
 
@@ -46,7 +47,7 @@
          onclick={(e) => {
             e.stopPropagation();
             launcher.toggle();
-         }}></div>
+         }}><Icon class="icon" name="plasma-logo-monochrome" /></div>
 
     <div id="task-manager">
         {#each applications as app}
@@ -72,8 +73,6 @@
             {now.toLocaleDateString([], {dateStyle: "short"})}
         </span>
     </div>
-
-    <div id="notification" style:mask="url(/icons/notifications.svg)"></div>
 </div>
 
 <style>
@@ -89,8 +88,13 @@
         display: flex;
         height: var(--panel-height);
         width: var(--panel-height);
+        margin-left: .5rem;
+    }
+    
+    #panel #launcher-icon :global(.icon) {
+        height: 100%;
+        width: 100%;
         background-color: var(--text);
-        mask: url(/icons/plasma-logo-monochrome.svg);
         transform: scale(0.7);
         margin-left: .5rem;
     }
@@ -103,6 +107,8 @@
         justify-content: center;
         width: 6rem;
         height: 100%;
+    
+        padding-right: 2rem;
     }
 
     #clock span {
@@ -114,15 +120,6 @@
         font-size: 0.85rem;
     }
  
-    #panel #notification {
-        height: calc(var(--panel-height) * 0.7);
-        width: calc(var(--panel-height) * 0.7);
-        background-color: var(--text);
-        mask-repeat: no-repeat !important;
-        mask-position: center !important;
-        margin-right: 1rem;
-    }
-
     #panel #task-manager {
         position: absolute;
         left: 50%;

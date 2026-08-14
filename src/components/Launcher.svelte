@@ -5,6 +5,7 @@
     import { sessionMenu } from '../state/sessionMenu.svelte.js';
     import { lockScreen } from '../state/lockScreen.svelte.js';
     import { user } from '../constants.js';
+    import Icon from './Icon.svelte';
     
     function focusSelf(node: HTMLInputElement) {
         node.focus();
@@ -53,7 +54,7 @@
                  {displayedName}</div>
         </div>
         <div id="search-box">
-            <div class="icon" style:mask=url(/icons/system-search-symbolic.svg)></div>
+            <Icon name="system-search-symbolic" mode="mask" class="icon" />
             <input 
                 use:focusSelf
                 type="text" 
@@ -62,19 +63,15 @@
             />
         </div>
         <div id="actions">
-            <div class="icon"
-                 style:mask=url(/icons/settings-configure-symbolic.svg)
-                 style:width=32px
-                 style:height=32px
-                 style:scale=0.75
-            ></div>
-            <div class="icon"
-                 style:mask={launcher.pinned ? "url(/icons/window-unpin-symbolic.svg)" : "url(/icons/window-pin-symbolic.svg)"}
-                 style:width=32px
-                 style:height=32px
-                 style:scale=0.75
+            <Icon
+                 name="settings-configure-symbolic"
+                 class="icons"
+            />
+            <Icon
+                 name={launcher.pinned ? "window-unpin-symbolic" : "window-pin-symbolic"}
+                 class="icons"
                  onclick={launcher.togglePinned}
-            ></div>
+            />
         </div>
     </div>
     
@@ -89,7 +86,7 @@
                      wm.openApplication(app);
                      launcher.close();
                  }}>
-                <img src={app.icon} alt={app.name} class="app-item-icon" />
+                <Icon name={app.icon} alt={app.name} class="app-item-icon" mode="img" />
                 <div class="app-item-meta">
                     <span class="app-item-name">{app.name}</span>
                     <span class="app-item-desc">{app.description}</span>
@@ -102,9 +99,7 @@
         <div id="power-actions">
             <div class="power-action"
                  onclick={ () => {window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 't=' + Date.now();} }>
-                <div class="icon action-icon"
-                     style:mask=url(/icons/system-reboot-symbolic.svg)
-                ></div>Restart
+                <Icon class="icon action-icon" name="system-reboot-symbolic" />Restart
             </div>
             <div class="power-action"
                  onclick={ () => {
@@ -113,14 +108,10 @@
                     body.style.backgroundColor = "#000";
                     body.style.cursor = "none";
                     } }>
-                <div class="icon action-icon"
-                     style:mask=url(/icons/system-shutdown-symbolic.svg)
-                ></div>Shut Down
+                <Icon class="icon action-icon" name="system-shutdown-symbolic" />Shut Down
             </div>
             <div class="power-action" onclick={(e) => sessionMenu.toggle(e)}>
-                <div class="icon action-icon"
-                     style:mask=url(/icons/system-log-out-circle.svg)
-                ></div>Session
+                <Icon class="icon action-icon" name="system-log-out-circle" />Session
             </div>
         </div>
     </div>
@@ -135,15 +126,15 @@
          style:left="{sessionMenu.x}px">
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><div class="icon action-icon" style:mask=url(/icons/lock-symbolic.svg)></div>Lock</div>
+        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><Icon name="lock-symbolic" class="icon action-icon"/>Lock</div>
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><div class="icon action-icon" style:mask=url(/icons/system-switch-user-symbolic.svg)></div>Switch User</div>
+        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><Icon name="system-switch-user-symbolic" class="icon action-icon"/>Switch User</div>
     </div>
 {/if}
 
 <style>
-    .icon {
+    #launcher :global(.icon) {
         background-color: var(--text);
         mask-repeat: no-repeat !important;
         mask-position: center !important;
@@ -220,7 +211,7 @@
         width: 50%;
     }
 
-    #launcher #header #search-box div {
+    #launcher #header #search-box :global(.icon) {
         height: 16px;
         width: 16px;
     }
@@ -243,6 +234,12 @@
     #launcher #header #actions {
         display: flex;
         margin-left: 4px;
+    }
+
+    #launcher #header #actions :global(.icons) {
+        width: 32px;
+        height: 32px;
+        scale: 0.75;
     }
 
     #launcher #apps-list {
@@ -273,7 +270,7 @@
         border: 1px solid var(--accent);
     }
 
-    .app-item .app-item-icon {
+    .app-item :global(.app-item-icon) {
         width: 32px;
         height: 32px;
     }
@@ -318,7 +315,7 @@
         border-color: var(--accent);
     }
 
-    .action-icon {
+    #launcher :global(.action-icon) {
         width: 20px;
         height: 20px;
         margin-right: 4px;

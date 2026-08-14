@@ -6,6 +6,7 @@
     import type { Window } from '../types/window.js';
     import { panelState } from '../state/panel.svelte.js';
     import { launcher } from '../state/launcher.svelte.js';
+  import Icon from './Icon.svelte';
 
     let vpWidth = $state(0);
     let vpHeight = $state(0);
@@ -185,12 +186,12 @@
                     <button class="minimize-btn" onclick={(e) => {
                         e.stopPropagation();
                         wm.toggleVisibility(win.instanceId);
-                    }}><div class="action-icon" style:mask=url(/icons/window-minimize-symbolic.svg)></div></button>
+                    }}><Icon class="action-icon" name="window-minimize-symbolic" mode="mask" /></button>
                     <!-- svelte-ignore a11y_consider_explicit_label -->
                     <button class="close-btn" onclick={(e) => {
                         e.stopPropagation();
                         wm.closeWindow(win.instanceId);
-                    }}><div class="action-icon" style:mask=url(/icons/tab-close-symbolic.svg)></div></button>
+                    }}><Icon class="action-icon" name="tab-close-symbolic" mode="mask" /></button>
                 </div>
             </div>
             
@@ -269,9 +270,11 @@
         color: white;
         padding: 0;
         margin: 1px;
+        width: 16px;
+        height: 16px;
     }
 
-    .window .titlebar .action-buttons .action-icon {
+    .window .titlebar .action-buttons :global(.action-icon) {
         background-color: var(--text);
         border-radius: 50%;
     }
@@ -281,7 +284,7 @@
         border-radius: 50%;
     }
 
-    .window .titlebar .action-buttons .close-btn:hover .action-icon {
+    .window .titlebar .action-buttons .close-btn:hover :global(.action-icon) {
         background-color: var(--base);
     }
     
@@ -290,7 +293,7 @@
         border-radius: 50%;
     }
     
-    .action-icon {
+    .window :global(.action-icon) {
         background-color: var(--text);
         mask-repeat: no-repeat !important;
         mask-position: center !important;

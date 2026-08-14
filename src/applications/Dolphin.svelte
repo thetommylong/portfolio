@@ -4,6 +4,7 @@
   import type { Repository } from "../types/repo.d.ts";
   import { tooltip } from "../state/tooltip.svelte";
   import { settings } from "../state/settings.svelte.js";
+  import Icon from "../components/Icon.svelte";
 
   let repos: Repository[] = [];
   let selectedItem: Repository | null = null;
@@ -41,13 +42,13 @@
                           onclick={() => { if (selectedItem?.full_name === repo.full_name) open(repo.html_url); selectedItem = repo; }}
                           onmouseenter={(e) => { tooltip.hover(e, repo.name, repo.description); if (!settings.doubleClickToOpen) selectedItem = repo; }}
                           onmouseleave={tooltip.leave}>
-        <img src="/icons/folder.svg" alt="{repo.name}"/>
+        <Icon name="folder" mode="img" class="icon"/>
         <p>{repo.name}</p>
         </div>
       {/each}
     </div>
   <div class="preview">
-    <img src="/icons/folder.svg" alt="{selectedItem?.name}" /> 
+    <Icon name="folder" mode="img" class="icon" />
     <p>{selectedItem?.name}</p>
     <div class="metadata">
         <div class="metadata-a">Language:</div>
@@ -108,7 +109,7 @@
     border-color: var(--accent);
   }
 
-  .item img {
+  .item :global(.icon) {
     width: 64px;
     height: 64px;
   }
@@ -133,7 +134,7 @@
     flex-shrink: 0;
   }
 
-  .preview img {
+  .preview :global(.icon) {
     width: 80%;
     aspect-ratio: 1;
   }
