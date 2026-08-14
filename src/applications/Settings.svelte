@@ -3,15 +3,19 @@
     import { settings } from "../state/settings.svelte";
     import { colorScheme } from "../types/settings";
 
+    import latte from "/misc/latte.jpg?url"
+    import mocha from "/misc/mocha.jpg?url"
+    import auto from "/misc/auto.jpg?url"
+
     let files = $state<FileList>();
     $effect(() => {
         if (files?.[0].name) settings.setWallpaper(files?.[0] ?? null);
     });
 
     const themeOptions = [
-        { id: colorScheme.CatppuccinLatte, label: "Catppuccin Latte", img: `${import.meta.env.BASE_URL}misc/latte.jpg` },
-        { id: colorScheme.CatppuccinMocha, label: "Catppuccin Mocha", img: `${import.meta.env.BASE_URL}misc/mocha.jpg` },
-        { id: colorScheme.Automatic, label: "Automatic", img: `${import.meta.env.BASE_URL}misc/auto.jpg` }
+        { id: colorScheme.CatppuccinLatte, label: "Catppuccin Latte", img: latte },
+        { id: colorScheme.CatppuccinMocha, label: "Catppuccin Mocha", img: mocha },
+        { id: colorScheme.Automatic, label: "Automatic", img: auto }
     ];
 </script>
 

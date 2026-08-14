@@ -11,5 +11,5 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   plugins: [svelte()],
-  base: "/portfolio",
+  base: "./",
 })
