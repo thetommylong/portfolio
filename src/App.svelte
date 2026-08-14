@@ -13,6 +13,7 @@
     
     import { background } from './constants';
     import { lockScreen } from './state/lockScreen.svelte';
+    import { wm } from './state/wm.svelte';
 
     let flavorName = $derived(resolveFlavorName(settings.colorScheme));
 
@@ -36,6 +37,9 @@
 
         // start the timer
         lockScreen.resetLockTimeout();
+
+        // start info center on load after delay
+        setTimeout(() => wm.openAppById("info"), 5000);
     });
 
     onDestroy(() => {
