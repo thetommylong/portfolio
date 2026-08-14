@@ -1,4 +1,4 @@
-let locked = $state(true);
+let locked = $state(false);
 
 const idlePeriod = 10 * 60 * 1000;
 let idleTimer: ReturnType<typeof setTimeout>;
