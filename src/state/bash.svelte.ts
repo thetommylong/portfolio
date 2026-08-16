@@ -35,28 +35,39 @@ export function terminal(node: HTMLElement) {
 
     const processCommand = async (input: string) => {
         const val = input.trim();
-        const [name, ...args] = val.split(/\s+/);
+        
+        const tokens = val ? val.split(/\s+/) : [];
+        let name = tokens[0] || "";
+        let args = tokens.slice(1);
 
         if (!val && !commandExecutionInProgress) {
             writePrompt();
             return;
         }
 
-        const command = commandExecutionInProgress ? lastExecutedCommand : name;
-        const callback = await runCommand(command, ...args);
-
-        if (callback.finished) {
-            promptString = DEFAULT_PROMPT;
-            commandExecutionInProgress = false;
-            lastExecutedCommand = "";
-        } else {
-            promptString = callback.prompt ? `\x1b[32m${callback.prompt}\x1b[0m ` : DEFAULT_PROMPT;
-            commandExecutionInProgress = true;
-            lastExecutedCommand = command;
+        if (commandExecutionInProgress) {
+            name = lastExecutedCommand;
+            args = ["--continue", val];
         }
 
-        if (callback.result) {
-            term.write(`\r\n${callback.result.replace(/\n/g, "\r\n")}`);
+        try {
+            const callback = await runCommand(name, ...args);
+
+            if (callback.finished) {
+                promptString = DEFAULT_PROMPT;
+                commandExecutionInProgress = false;
+                lastExecutedCommand = "";
+            } else {
+                promptString = callback.prompt ? `\x1b[32m${callback.prompt}\x1b[0m ` : DEFAULT_PROMPT;
+                commandExecutionInProgress = true;
+                lastExecutedCommand = name;
+            }
+
+            if (callback.result) {
+                term.write(`\r\n${callback.result.replace(/\n/g, "\r\n")}`);
+            }
+        } catch (err) {
+            term.write(`\r\nUncaught Error: ${String(err)}`);
         }
 
         writePrompt();

@@ -9,7 +9,7 @@ const command: Command = {
             kernelName: "Linux",
             nodename: user.hostname,
             kernelRelease: "28.12.4",
-            hardwarePlatform: "x86_64",
+            hardwarePlatform: navigator.platform,
             operatingSystem: "GNU/Linux"
         };
 
