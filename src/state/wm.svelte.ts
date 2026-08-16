@@ -1,4 +1,4 @@
-import { applications } from "../constants";
+import { applications } from "../apps";
 import type { Application, Window } from "../types/window";
 
 let windows = $state<Window[]>([]);

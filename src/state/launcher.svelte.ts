@@ -1,4 +1,4 @@
-import { applications } from "../constants";
+import { applications } from "../apps";
 
 let isOpen = $state(false);
 let searchQuery = $state("");

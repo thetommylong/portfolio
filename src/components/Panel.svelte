@@ -4,7 +4,7 @@
     import { launcher } from '../state/launcher.svelte';
     import { panelState } from '../state/panel.svelte';
     import { tooltip } from '../state/tooltip.svelte';
-    import { applications } from '../constants';
+    import { applications } from '../apps';
   import Icon from './Icon.svelte';
 
     let { now } = $props();
