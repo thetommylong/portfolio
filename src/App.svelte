@@ -13,7 +13,7 @@
     
     import { background } from './constants';
     import { lockScreen } from './state/lockScreen.svelte';
-    import { wm } from './state/wm.svelte';
+    import { wm } from './state/wm.svelte.ts';
 
     let flavorName = $derived(resolveFlavorName(settings.colorScheme));
 

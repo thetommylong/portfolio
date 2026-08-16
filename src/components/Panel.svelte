@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { wm } from '../state/wm.svelte';
+    import { wm } from '../state/wm.svelte.ts';
     import type { Application } from '../types/window';
     import { launcher } from '../state/launcher.svelte';
     import { panelState } from '../state/panel.svelte';

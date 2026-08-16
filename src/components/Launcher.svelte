@@ -1,7 +1,7 @@
 <script lang="ts">
     import { slide, fade } from 'svelte/transition';
     import { launcher } from '../state/launcher.svelte.js';
-    import { wm } from '../state/wm.svelte.js';
+    import { wm } from '../state/wm.svelte.ts';
     import { sessionMenu } from '../state/sessionMenu.svelte.js';
     import { lockScreen } from '../state/lockScreen.svelte.js';
     import { user } from '../constants.js';

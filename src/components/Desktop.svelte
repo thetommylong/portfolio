@@ -1,7 +1,7 @@
 <script lang="ts">
     import { scale } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
-    import { wm } from '../state/wm.svelte.js';
+    import { wm } from '../state/wm.svelte';
 
     import type { Window } from '../types/window.js';
     import { panelState } from '../state/panel.svelte.js';

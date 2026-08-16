@@ -1,101 +1,124 @@
-import { wm } from "./wm.svelte";
+import { tick } from "svelte";
+import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
+
 import { user } from "../constants";
+import { runCommand } from "../commands/index";
 
-let history = $state<string[]>([]);
-let location = $state("/");
+const DEFAULT_PROMPT = `[${user.username}@${user.hostname} ~]$\x1b[0m `;
 
-let console_e = $state<HTMLElement>();
-let input = $state<HTMLInputElement>();
+export function terminal(node: HTMLElement) {
+    let currentLine = "";
+    let promptString = DEFAULT_PROMPT;
+    let commandExecutionInProgress = false;
+    let lastExecutedCommand = "";
 
-export const bash = {
-    get prompt() { return `[${user.username}@${user.hostname} ${location}]~`},
-    set location(path: string) { location = path; },
-    get history() { return history; },
+    const term = new Terminal({
+        cursorBlink: true,
+        theme: {
+            background: "#1e1e2e",
+            foreground: "#cdd6f4",
+            cursor: "#f5e0dc"
+        },
+        fontFamily: "monospace",
+        fontSize: 14,
+        allowProposedApi: true,
+    });
 
-    handleKeyDown(e: KeyboardEvent) {
-        if (e.key !== "Enter") return;
-        if (!input) return;
-        const val = input.value.trim().split(" ");
-        history.push(`${this.prompt} ${val}`);
-        const command = val[0]; 
-        const args = val.slice(1);
+    const fitAddon = new FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(node);
 
-        let output = "";
+    applyTheme(term);
 
-        switch (command) {
-            case "clear": {
-                history = [];
-                output = "";
-                input.value = "";
-                return;
-            }
-            case "whoami": {
-                output = user.username;
-                break;
-            }
-            case "uname": {
-                if (!args[0]) {
-                    output = "Linux";
-                }
-                switch (args[0]) {
-                    case "-n": {
-                        output = user.hostname;
-                        break;
-                    }
-                    case "-i": {
-                        output = "unknown";
-                        break;
-                    }
-                    case "-p": {
-                        output = "unknown";
-                        break;
-                    }
-                    case "-o": {
-                        output = "GNU/Linux";
-                        break;
-                    }
-                    default: {
-                        output = "Linux";
-                        break;
-                    }
-                }
-                break;
-            }
-            case "exit": {
-                output = "Please close the window manually. Closing via the command line will be implemented in a future release.";
-                break;
-            }
-            case "sudo": {
-                output = `${user.username} is not in the sudoers file. This incident will be reported.`
-                break;
-            }
-            case "echo": {
-                output = val.join(" ");
-                break;
-            }
-            case "vi": case "vim": case "nvim": {
-                output = "Please learn how to exit vi before using this tool."
-                break;
-            }
-            case "fastfetch": case "neofetch": {
-                wm.openAppById("info");
-                break;
-            }
-            case "": {
-                break;
-            }
-            default: {
-                output = `bash: ${val}: command not found`;
-                break;
-            }
-        } 
+    const writePrompt = () => term.write(`\r\n${promptString}`);
 
-        history.push(output);
-        input.value = "";
-        if (console_e) console_e.scrollTop = console_e.scrollHeight;
-    },
+    const processCommand = async (input: string) => {
+        const val = input.trim();
+        const [name, ...args] = val.split(/\s+/);
 
-    register(node: HTMLElement) { console_e = node; console_e.addEventListener("click", () => input?.focus()) },
+        if (!val && !commandExecutionInProgress) {
+            writePrompt();
+            return;
+        }
 
-    registerInput(node: HTMLInputElement) { input = node; }
+        const command = commandExecutionInProgress ? lastExecutedCommand : name;
+        const callback = await runCommand(command, ...args);
+
+        if (callback.finished) {
+            promptString = DEFAULT_PROMPT;
+            commandExecutionInProgress = false;
+            lastExecutedCommand = "";
+        } else {
+            promptString = callback.prompt ? `\x1b[32m${callback.prompt}\x1b[0m ` : DEFAULT_PROMPT;
+            commandExecutionInProgress = true;
+            lastExecutedCommand = command;
+        }
+
+        if (callback.result) {
+            term.write(`\r\n${callback.result.replace(/\n/g, "\r\n")}`);
+        }
+
+        writePrompt();
+    };
+
+    const dataDisposable = term.onData(async (data) => {
+        if (data === "\r") {
+            const line = currentLine;
+            currentLine = "";
+            await processCommand(line);
+        } else if (data === "\x7f") {
+            if (currentLine.length > 0) {
+                currentLine = currentLine.slice(0, -1);
+                term.write("\b \b");
+            }
+        } else if (data >= " ") {
+            currentLine += data;
+            term.write(data);
+        }
+    });
+
+    const resizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(() => {
+            try {
+                fitAddon.fit();
+            } catch (e) {}
+        });
+    });
+    resizeObserver.observe(node);
+
+    const themeObserver = new MutationObserver(() => {
+        applyTheme(term);
+    });
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["style"]
+    })
+
+    tick().then(() => {
+        setTimeout(() => {
+            fitAddon.fit();
+            term.write(DEFAULT_PROMPT);
+        }, 50);
+    });
+
+    return {
+        destroy() {
+            resizeObserver.disconnect();
+            themeObserver.disconnect();
+            dataDisposable.dispose();
+            term.dispose();
+        }
+    };
+}
+
+function applyTheme(term: Terminal) {
+    const style = getComputedStyle(document.documentElement);
+    
+    term.options.theme = {
+        background: style.getPropertyValue("--base").trim() || "#1e1e2e",
+        foreground: style.getPropertyValue("--text").trim() || "#cdd6f4",
+        cursor: style.getPropertyValue("--accent").trim() || "#f5e0dc",
+        selectionBackground: style.getPropertyValue("--accent").trim() + "33" 
+    };
 }
