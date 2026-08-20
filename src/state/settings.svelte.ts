@@ -34,15 +34,20 @@ $effect.root(() => {
     $effect(() => {
         localStorage.setItem("settings", JSON.stringify(currentSettings));
 
-        document.body.style.setProperty('--speed', `${currentSettings.animationSpeed}`);
+        const speed = prefersReducedMotion ? 0 : currentSettings.animationSpeed;
+        document.body.style.setProperty('--speed', `${speed}`);
 
         const resolvedTheme = resolveFlavorName(currentSettings.colorScheme).toString();
         document.documentElement.setAttribute("data-theme", resolvedTheme);
     });
 });
 
+const prefersReducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+let prefersReducedMotion = $state(prefersReducedMotionQuery.matches);
+prefersReducedMotionQuery.addEventListener("change", () => { prefersReducedMotion = prefersReducedMotionQuery.matches; });
+
 export const settings = {
-    get animationSpeed() { return currentSettings.animationSpeed },
+    get animationSpeed() { return prefersReducedMotion ? 0 : currentSettings.animationSpeed },
     set animationSpeed(value) {currentSettings.animationSpeed = value },
     get colorScheme() { return currentSettings.colorScheme },
     set colorScheme(value: colorScheme) { currentSettings.colorScheme = value },
