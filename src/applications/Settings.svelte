@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { derived } from "svelte/store";
     import { settings } from "../state/settings.svelte";
     import { colorScheme } from "../types/settings";
 
     import latte from "/misc/latte.jpg?url"
     import mocha from "/misc/mocha.jpg?url"
     import auto from "/misc/auto.jpg?url"
-  import { set } from "idb-keyval";
 
     let files = $state<FileList>();
     $effect(() => {
@@ -23,9 +21,13 @@
 <div class="container">
     <div class="themes">
         {#each themeOptions as item}
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <div class="theme" onclick={() => settings.colorScheme = item.id}>
+            <div class="theme" 
+                 role="button"
+                 tabindex="0"
+                 aria-label={`Select ${item.label} theme`}
+                 aria-pressed={settings.colorScheme === item.id}
+                 onclick={() => settings.colorScheme = item.id}
+                 onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); settings.colorScheme = item.id; } }}>
                 <img 
                     src={item.img} 
                     alt={item.label} 

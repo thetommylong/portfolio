@@ -6,7 +6,7 @@
   import Icon from "./Icon.svelte";
   import { settings } from "../state/settings.svelte";
 
-    let { now } = $props();
+    const { now } = $props();
 
     onDestroy(() => {
         lockScreen.destroy();
@@ -25,19 +25,15 @@
         <div id="name">{user.displayName}</div>
         <div id="username">{user.username}</div>
         <div id="input">
-            <input type="password" onkeydown={(e) => {if (e.key === "Enter") lockScreen.locked = false;}} />
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div id="button" onclick={() => { lockScreen.locked = false; }} >
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <input type="password" aria-label="Password" onkeydown={(e) => {if (e.key === "Enter") lockScreen.locked = false;}} />
+            <button id="button" aria-label="Unlock" onclick={() => { lockScreen.locked = false; }} >
                 <Icon class="submit" name="system-log-in-symbolic" />
-            </div>
+            </button>
         </div>
         <div id="actions">
             <!-- The following button does nothing. -->
             <!-- I am not making another lock screen to replicate SDDM-->
-            <div class="action"><Icon class="icon action-icon" name="system-switch-user-symbolic" />Switch User</div>
+            <div class="action" role="button" tabindex="0"><Icon class="icon action-icon" name="system-switch-user-symbolic" />Switch User</div>
         </div>
     </div>
 </div>

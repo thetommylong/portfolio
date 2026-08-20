@@ -5,7 +5,7 @@ let searchQuery = $state("");
 let pinned = $state(false);
 let selectedIndex = $state(0);
 
-let filteredApplications = $derived(
+const filteredApplications = $derived(
     searchQuery.trim() === "" 
         ? applications 
         : applications.filter(app => 

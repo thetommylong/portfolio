@@ -12,7 +12,7 @@ const initialSettings: Settings = {
     wallpaper: null,
     ...(saved ? JSON.parse(saved) : {})
 };
-let currentSettings = $state<Settings>(initialSettings);
+const currentSettings = $state<Settings>(initialSettings);
 
 // wallpaper might be too big so
 let wallpaperUrl = $state<string | null>(null);

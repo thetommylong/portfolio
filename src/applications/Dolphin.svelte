@@ -8,6 +8,7 @@
 
   let repos: Repository[] = [];
   let selectedItem: Repository | null = null;
+  let error: string | null = null;
 
   onMount(async () => {
     try {
@@ -26,6 +27,7 @@
       localStorage.setItem("repos_ttl", (Date.now() + 24 * 60 * 60 * 1000).toString());
       }
     } catch (e) {
+      error = e instanceof Error ? e.message : "Failed to load repositories";
       console.error(e);
     } finally {
       selectedItem = repos[0];
@@ -34,19 +36,27 @@
 </script>
 
 <div class="nintendo-gamecube-codename">
+    {#if error}
+      <div class="repos">
+        <p class="error-message">{error}</p>
+      </div>
+    {:else}
     <div class="repos">
-      {#each repos as repo}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        {#each repos as repo}
         <div class="item" class:selected={ selectedItem?.full_name === repo.full_name }
+                          role="button"
+                          tabindex="0"
+                          aria-label={repo.name}
                           onclick={() => { if (selectedItem?.full_name === repo.full_name) open(repo.html_url); selectedItem = repo; }}
                           onmouseenter={(e) => { tooltip.hover(e, repo.name, repo.description); if (!settings.doubleClickToOpen) selectedItem = repo; }}
-                          onmouseleave={tooltip.leave}>
+                          onmouseleave={tooltip.leave}
+                          onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (selectedItem?.full_name === repo.full_name) open(repo.html_url); selectedItem = repo; } }}>
         <Icon name="folder" mode="img" class="icon"/>
         <p>{repo.name}</p>
         </div>
       {/each}
     </div>
+    {/if}
   <div class="preview">
     <Icon name="folder" mode="img" class="icon" />
     <p>{selectedItem?.name}</p>
@@ -165,5 +175,12 @@
 
   .metadata-a {
     text-align: right;
+  }
+
+  .error-message {
+    color: var(--red);
+    padding: 16px;
+    width: 100%;
+    text-align: center;
   }
 </style>
