@@ -1,6 +1,6 @@
 import { settings } from "./state/settings.svelte"
 
-import wallpaper from "/background/mountain.png?url"
+import wallpaper from "/background/mountain.jpg?url"
 
 export const user = {
     displayName: "TheTommylong",
