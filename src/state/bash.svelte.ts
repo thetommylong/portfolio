@@ -93,7 +93,7 @@ export function terminal(node: HTMLElement) {
         requestAnimationFrame(() => {
             try {
                 fitAddon.fit();
-            } catch (e) {}
+            } catch { /* ignore fit errors during resize */ }
         });
     });
     resizeObserver.observe(node);

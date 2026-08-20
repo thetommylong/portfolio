@@ -14,7 +14,8 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "moduleDetection": "force"
+    "moduleDetection": "force",
+    "allowImportingTsExtensions": true
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "src/App.svelte.bak", "src/state/wm.svelte.ts.bak"]
 }

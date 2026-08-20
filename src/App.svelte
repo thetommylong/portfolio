@@ -15,7 +15,8 @@
     import { lockScreen } from './state/lockScreen.svelte';
     import { wm } from './state/wm.svelte.ts';
 
-    let flavorName = $derived(resolveFlavorName(settings.colorScheme));
+    const flavorName = $derived(resolveFlavorName(settings.colorScheme));
+    let shutdown = $state(false);
 
     $effect(() => {
         const flavor = flavors[flavorName] || flavors.mocha;
@@ -25,6 +26,12 @@
             root.style.setProperty(`--${name}`, meta.hex);
         }
     });
+
+    $effect(() => {
+        if (document.documentElement.style.getPropertyValue('--shutdown')) {
+            shutdown = true;
+        }
+    });
  
     // time
     let now = $state(new Date());
@@ -32,8 +39,12 @@
 
     onMount(() => {
         // reset idle on events
-        const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
-        events.forEach(event => window.addEventListener(event, lockScreen.resetLockTimeout));
+        const passive = { passive: true };
+        window.addEventListener("mousemove", lockScreen.resetLockTimeout);
+        window.addEventListener("mousedown", lockScreen.resetLockTimeout);
+        window.addEventListener("keydown", lockScreen.resetLockTimeout);
+        window.addEventListener("touchstart", lockScreen.resetLockTimeout, passive);
+        window.addEventListener("scroll", lockScreen.resetLockTimeout, passive);
 
         // start the timer
         lockScreen.resetLockTimeout();
@@ -84,9 +95,13 @@
     button {
         background-color: var(--accent);
         border: none;
-        outline: none;
         border-radius: 24px;
         padding: 1rem;
+    }
+
+    button:focus-visible {
+        outline: 2px solid var(--text);
+        outline-offset: 2px;
     }
 </style>
 {:else}
@@ -103,19 +118,53 @@
 {/if}
 
 {#if !lockScreen.locked}
-<div id="content" transition:fade={{ duration: 150 * settings.animationSpeed }}>
+<a href="#content" class="skip-link">Skip to content</a>
+<div id="content" role="main" transition:fade={{ duration: 150 * settings.animationSpeed }}>
     <Panel {now} />
     <Launcher />
     <Desktop />
     <Tooltip />
 </div>
 {/if}
+
+{#if shutdown}
+<div id="shutdown-overlay" role="alert" aria-live="assertive">
+    <p>System halted.</p>
+</div>
+{/if}
 {/if}
 
 <style>
+    :global(.visually-hidden) {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    :global(.skip-link) {
+        position: absolute;
+        top: -100%;
+        left: 0;
+        padding: 8px 16px;
+        background: var(--accent);
+        color: var(--text);
+        z-index: 99999;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    :global(.skip-link:focus) {
+        top: 0;
+    }
+
     :global(:root) {
         font-family: "Noto Sans", sans-serif;
-        user-select: none;
     }
 
     :global(body) {
@@ -124,6 +173,17 @@
         overflow: hidden;
 
         --speed: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(*),
+        :global(*::before),
+        :global(*::after) {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
     }
     
     :global(#app) {
@@ -155,5 +215,17 @@
     .blurred {
         filter: blur(20px);
         transform: scale(1.05);
+    }
+
+    #shutdown-overlay {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        font-size: 1.2rem;
     }
 </style>

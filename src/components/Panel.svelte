@@ -7,7 +7,7 @@
     import { applications } from '../apps';
   import Icon from './Icon.svelte';
 
-    let { now } = $props();
+    const { now } = $props();
 
     function onTaskInteraction(app: Application) {
         if (!wm.isRunning(app.id)) wm.openApplication(app);
@@ -31,35 +31,36 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
-<div id="panel"
+<header id="panel"
      style:--panel-height="{panelState.height}px"
      onclick={(e) => {
         e.stopPropagation();
         launcher.close();
      }}>
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div id="launcher-icon"
          tabindex="0"
+         role="button"
+         aria-label="Application Launcher"
          onmouseenter={(e) => tooltip.hover(e, "Application Launcher", "Launcher to start applications")}
          onmouseleave={tooltip.leave}
          onclick={(e) => {
             e.stopPropagation();
             launcher.toggle();
-         }}><Icon class="icon" name="plasma-logo-monochrome" /></div>
+         }}
+         onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); launcher.toggle(); } }}><Icon class="icon" name="plasma-logo-monochrome" /></div>
 
-    <div id="task-manager">
+    <div id="task-manager" role="toolbar" aria-label="Running applications">
         {#each applications as app}
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
             <div class="task"
                  class:active={wm.isRunning(app.id)}
                  class:focused={wm.isAppFocused(app.id)}
                  role="button"
                  tabindex="0"
+                 aria-label={app.name}
                  onmouseenter={(e) => tooltip.hover(e, app.name, app.description)}
                  onmouseleave={tooltip.leave}
-                 onclick={() => onTaskInteraction(app)}>
+                 onclick={() => onTaskInteraction(app)}
+                 onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTaskInteraction(app); } }}>
                 <div class="task-icon" style:background="url({app.icon})"></div>
             </div>
         {/each}
@@ -73,7 +74,7 @@
             {now.toLocaleDateString([], {dateStyle: "short"})}
         </span>
     </div>
-</div>
+</header>
 
 <style>
     #panel {

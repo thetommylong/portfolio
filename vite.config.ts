@@ -9,6 +9,7 @@ export default defineConfig({
   },
   build: {
     assetsInlineLimit: 0,
+    sourcemap: 'hidden',
   },
   plugins: [svelte()],
   base: "./",

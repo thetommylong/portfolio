@@ -4,7 +4,7 @@ export interface Window {
     instanceId: string;
     appId: string;
     name: string;
-    component: any;
+    component: Component;
     x: number;
     y: number;
     width: number;

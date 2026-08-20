@@ -40,9 +40,13 @@
 
 
 {#if launcher.isOpen}
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div id="launcher"
+     role="combobox"
+     tabindex="-1"
+     aria-expanded="true"
+     aria-haspopup="listbox"
+     aria-controls="apps-list"
+     aria-activedescendant={launcher.selectedIndex >= 0 ? `app-option-${launcher.selectedIndex}` : undefined}
      transition:slide={{ duration: 150 * settings.animationSpeed }}
      onclick={(e) => e.stopPropagation()}
      onkeydown={handleKeyDown}>
@@ -50,17 +54,23 @@
         <div id="user">
             <div id="profile"><div id="sName">TT</div></div>
             <div id="name"
+                 role="presentation"
                  onmouseenter={() => { displayedName = `${user.username}@portfolio` }}
                  onmouseleave={() => { displayedName = user.displayName; }}>
                  {displayedName}</div>
         </div>
         <div id="search-box">
             <Icon name="system-search-symbolic" mode="mask" class="icon" />
+            <label for="launcher-search" class="visually-hidden">Search applications</label>
             <input 
+                id="launcher-search"
                 use:focusSelf
                 type="text" 
                 placeholder="Search..." 
+                aria-controls="apps-list"
+                aria-activedescendant={launcher.selectedIndex >= 0 ? `app-option-${launcher.selectedIndex}` : undefined}
                 bind:value={launcher.searchQuery}
+                onkeydown={handleKeyDown}
             />
         </div>
         <div id="actions">
@@ -76,17 +86,20 @@
         </div>
     </div>
     
-    <div id="apps-list">
+    <div id="apps-list" role="listbox" aria-label="Applications">
         {#each launcher.applications as app, i}
             <div class="app-item"
                  class:active={i === launcher.selectedIndex}
-                 role="button"
-                 tabindex="0"
+                 role="option"
+                 tabindex="-1"
+                 aria-selected={i === launcher.selectedIndex}
+                 id={`app-option-${i}`}
                  onmouseenter={() => launcher.selectedIndex = i}
                  onclick={() => {
                      wm.openApplication(app);
                      launcher.close();
-                 }}>
+                 }}
+                 onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); wm.openApplication(app); launcher.close(); } }}>
                 <Icon name={app.icon} alt={app.name} class="app-item-icon" mode="img" />
                 <div class="app-item-meta">
                     <span class="app-item-name">{app.name}</span>
@@ -97,23 +110,20 @@
     </div>
     
     <div id="footer">
-        <div id="power-actions">
-            <div class="power-action"
+        <div id="power-actions" role="toolbar" aria-label="Power actions">
+            <button class="power-action"
                  onclick={ () => {window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 't=' + Date.now();} }>
                 <Icon class="icon action-icon" name="system-reboot-symbolic" />Restart
-            </div>
-            <div class="power-action"
+            </button>
+            <button class="power-action"
                  onclick={ () => {
-                    const body = document.querySelector("body")!;
-                    body.innerHTML = "";
-                    body.style.backgroundColor = "#000";
-                    body.style.cursor = "none";
+                    document.documentElement.style.setProperty('--shutdown', '1');
                     } }>
                 <Icon class="icon action-icon" name="system-shutdown-symbolic" />Shut Down
-            </div>
-            <div class="power-action" onclick={(e) => sessionMenu.toggle(e)}>
+            </button>
+            <button class="power-action" onclick={(e) => sessionMenu.toggle(e)}>
                 <Icon class="icon action-icon" name="system-log-out-circle" />Session
-            </div>
+            </button>
         </div>
     </div>
 </div>
@@ -123,14 +133,12 @@
 <div id="session-dropdown" 
          use:sessionMenu.register
          transition:fade={{ duration: 100 * settings.animationSpeed }}
+         role="menu"
+         aria-label="Session menu"
          style:top="{sessionMenu.y}px"
          style:left="{sessionMenu.x}px">
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><Icon name="lock-symbolic" class="icon action-icon"/>Lock</div>
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="session-options" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><Icon name="system-switch-user-symbolic" class="icon action-icon"/>Switch User</div>
+        <button class="session-options" role="menuitem" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><Icon name="lock-symbolic" class="icon action-icon"/>Lock</button>
+        <button class="session-options" role="menuitem" onclick={() => { lockScreen.locked = true; sessionMenu.close(); }}><Icon name="system-switch-user-symbolic" class="icon action-icon"/>Switch User</button>
     </div>
 {/if}
 
@@ -310,6 +318,9 @@
         border-radius: 4px;
         padding: 2px 6px 2px 2px;
         font-size: 14px;
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
     }
 
     .power-action:hover {

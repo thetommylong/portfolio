@@ -104,8 +104,8 @@
         const MIN_HEIGHT = 150;        
 
         if (interactionType === 'drag') {
-            let newX = activeW.x + dX;
-            let newY = activeW.y + dY;
+            const newX = activeW.x + dX;
+            const newY = activeW.y + dY;
 
             const maxX = vpWidth - activeW.width;
             const maxY = vpHeight - activeW.height;
@@ -158,15 +158,16 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div id="desktop"
+     tabindex="-1"
      bind:clientWidth={vpWidth}
      bind:clientHeight={vpHeight}
      style:--panel-height="{panelState.height}px"
      class:dragging={interactionType === 'drag'}
      class:resizing-nwse={interactionType === 'resize' && ((resizeDirections.top && resizeDirections.left) || (resizeDirections.bottom && resizeDirections.right))}
      class:resizing-nesw={interactionType === 'resize' && ((resizeDirections.top && resizeDirections.right) || (resizeDirections.bottom && resizeDirections.left))}
-     onclick={() => launcher.close()}>
+     onclick={() => launcher.close()}
+     onkeydown={(e) => { if (e.key === 'Escape') launcher.close(); }}>
     {#each wm.windows as win (win.instanceId)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div class="window"
@@ -180,16 +181,14 @@
             oncontextmenu={(e) => { if (e.altKey) e.preventDefault(); }}
             onmousedown={(e) => handleWindowMouseDown(e, win)}
             >
-            <div class="titlebar" onmousedown={(e) => startInteraction(e, win, "drag")}>
+            <div class="titlebar" tabindex="-1" onmousedown={(e) => startInteraction(e, win, "drag")}>
                 <span class="title">{win.name}</span>
                 <div class="action-buttons">
-                    <!-- svelte-ignore a11y_consider_explicit_label -->
-                    <button class="minimize-btn" onclick={(e) => {
+                    <button class="minimize-btn" aria-label={`Minimize ${win.name}`} onclick={(e) => {
                         e.stopPropagation();
                         wm.toggleVisibility(win.instanceId);
                     }}><Icon class="action-icon" name="window-minimize-symbolic" mode="mask" /></button>
-                    <!-- svelte-ignore a11y_consider_explicit_label -->
-                    <button class="close-btn" onclick={(e) => {
+                    <button class="close-btn" aria-label={`Close ${win.name}`} onclick={(e) => {
                         e.stopPropagation();
                         wm.closeWindow(win.instanceId);
                     }}><Icon class="action-icon" name="tab-close-symbolic" mode="mask" /></button>
