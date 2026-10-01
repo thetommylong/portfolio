@@ -25,7 +25,7 @@ export const applications: Application[] = [
     {
         id: "dolphin",
         name: "Dolphin",
-        description: "Infomation about my projects",
+        description: "Information about my projects",
         app: Dolphin,
         icon: dolphin
     },

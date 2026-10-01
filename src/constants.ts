@@ -15,7 +15,7 @@ export const info = [
     { label: "OS", value: "sveLinux" },
     { label: "Host", value: navigator.platform || "Web Client" },
     { label: "Kernel", value: "Full Stack Development" },
-    { label: "Uptime", value: "Avaliable"},
+    { label: "Uptime", value: "Available"},
     { label: "Shell", value: "TypeScript" },
     { label: "DE", value: "KDE Plasma" },
     { label: "WM", value: "KWin (HTML)" },
