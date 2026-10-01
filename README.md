@@ -5,8 +5,6 @@ A KDE Plasma desktop that lives in a browser tab. Real window manager, working t
 > [!IMPORTANT]
 > Not affiliated with KDE or KDE e.V.
 
-Live at **[thetommylong.is-a.dev](https://thetommylong.is-a.dev/)**
-
 ## The Problem
 
 Everyone builds another todo app. I wanted to prove I could build something genuinely complex without it turning into a form with a database behind it — so I built an entire desktop environment instead. Dragging windows, z-order, focus management, a shell that parses commands. Make it weird, make it stick.
@@ -97,7 +95,7 @@ Everything lives in System Settings and persists to `localStorage`:
 
 - **Theme** — Latte, Mocha, or Automatic
 - **Wallpaper** — any image, stored in IndexedDB
-- **Animation scale** — `0` (instant) through `1` (full)
+- **Animation scale** — `0` (instant) through `2` (full)
 - **Click behavior** — single-click to select vs. double-click to open
 
 ## Known Limitations
